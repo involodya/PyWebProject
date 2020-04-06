@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>{{ title }}</title>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light navbar-expand-sm">
+        <h1 class="navbar-brand" href="#">Миссия Колонизация Марса</h1>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Mars One</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <h4 class="p-3 text-muted">И на Марсе будут яблони цвести!</h4>
+
+    <div class="container-fluid">{% block content %}{% endblock %}</div>
+</body>
+
+</html>

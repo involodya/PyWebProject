@@ -1,29 +1,32 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>{{ title }}</title>
-    {% block head %}{% endblock %}
-</head>
+<html>
+    <head>
+        <title>NAME OF THE PROJECT</title>
 
-<body>
-    <nav class="navbar navbar-light bg-light navbar-expand-sm">
-        <h1 class="navbar-brand" href="#">Миссия Колонизация Марса</h1>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Mars One</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+        <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootst.."
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <div id="navbar">
+            <div id="section">
+              <div id='menu-pointer'>
+                <span id="span-up"></span>
+                <span></span>
+                <span id="span-down"></span>
+              </div>
+              <nav id='nav-menu'>
+                <a class='nav-element' href='#'>Main</a>
+                <a class='nav-element' href='#'>Statistic</a>
+                <a class='nav-element' href='#'>Users</a>
+                <a class='nav-element' href='#'>Other</a>
+              </nav>
+            </div>
 
-    <h4 class="p-3 text-muted">И на Марсе будут яблони цвести!</h4>
+            <div id='tittle'>PROJECT NAME</div>
+          </div>
 
-    <div class="container-fluid">{% block content %}{% endblock %}</div>
-</body>
-
+          
+    </body>
 </html>

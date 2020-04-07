@@ -7,4 +7,4 @@ from app.data.user import User
 def index():
     db = create_session()
     users = ', '.join([str(i) for i in db.query(User)])
-    return 'All users  ' + users
+    return render_template('base.html')

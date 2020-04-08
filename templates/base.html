@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>NAME OF THE PROJECT</title>
+
+        <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <div id="navbar">
+            <div id="section">
+              <div id='menu-pointer'>
+                <span id="span-up"></span>
+                <span></span>
+                <span id="span-down"></span>
+              </div>
+              <nav id='nav-menu'>
+                <a class='nav-element' href='#'>Main</a>
+                <a class='nav-element' href='#'>Statistic</a>
+                <a class='nav-element' href='#'>Users</a>
+                <a class='nav-element' href='#'>Other</a>
+              </nav>
+            </div>
+
+            <div id='tittle'>PROJECT NAME</div>
+          </div>
+        <main role="main" class="container">
+            {% block content %}{% endblock %}
+        </main>
+
+    </body>
+</html>

@@ -14,7 +14,7 @@ def main():
 
 @app.route('/')
 def main_page():
-    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/style.css'))
+    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route('/join', methods=['GET', 'POST'])
@@ -43,7 +43,7 @@ def join():
         session.add(user)
         session.commit()
         return redirect('/login')
-    return render_template('join.html', title='Регистрация', form=form)
+    return render_template('join.html', title='Регистрация', form=form, css=url_for('static', filename='css/join_style.css'))
 
 
 @app.route('/login')

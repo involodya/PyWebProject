@@ -1,118 +1,66 @@
-:root {
-    --main1-color: white;
-    --main2-color: rgb(255, 145, 0);
-    --main3-color: rgb(173, 33, 33);
-    --secondary1-color: rgb(56, 5, 151);
-    --secondary2-color: rgb(0, 0, 0);
-    --secondary3-color: rgb(0, 0, 0);
-  }
+@keyframes Header-coronavirus {
+0% {
+    color: #ea316d;
+}
+25% {
+    color: #823bc5;
+}
+50% {
+    color: #535efd;
+}
+75% {
+    color: #ffce60;
+}
+100% {
+    color: #ea316d;
+}
+}
 
-  *{
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    box-sizing: border-box;
-    background-color: var(--main1-color);
-  }
+body {
+    background-color: #212529;
+}
 
-  #navbar{
-    color: #555555;
-    background-color: var(--main2-color);
-    height: 70px;
-    width: 100%;
-    padding: 10px;
+selection {
+  display: block;
+}
+
+iframe {
+    display: block;
+    margin-top: 0px;
+    margin-right: auto;
+    margin-bottom: 0px;
+    margin-left: auto;
+    padding-top: 30px;
+    padding-right: 0px;
+    padding-bottom: 30px;
+    padding-left: 0px;
+}
+
+.Main-content {
     display: flex;
-  }
+    flex-flow: column nowrap;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
 
-  #section{
-    min-width: 33%;
-    height: 100%;
-    background-color: var(--main2-color);
-    border-radius: 0px;
-    display: flex;
-    align-items: center;
-    align-content: space-between;
-  }
-
-  #menu-pointer{
-    position: relative;
-    z-index: 3;
-    height: 50px;
-    width: 50px;
-    background-color: var(--main3-color);
-    border-radius: 50%;
-    margin-right: 15px;
-  }
-
-  .nav-element{
-    position: relative;
+.Content-unit {
     margin-left: 30px;
-    margin-right: 6px;
-    text-decoration: none;
-    color: ver(--secondary1-color);
-    background-color: var(--main3-color);
-  }
+    margin-right: 30px;
+    margin-bottom: 15px;
+    padding: 2.25rem;
+    border-radius: 10px;
+    background: #f2f2f2;
+}
 
-  #menu-pointer span{
-    background-color: var(--main2-color);
-    height: 4px;
-    width: 44%;
-    position: absolute;
-    top: 50%; margin-top: -1px;
-    left: 50%; margin-left: -11px;
-    border-radius: 2px;
-    transition: 0.2s;
-
-  }
-
-  #span-up{
-    transform: translateY(-7px);
-  }
-
-  #span-down{
-    transform: translateY(7px);
-  }
-
-  #section:hover #span-up{
-    transform: rotate(-35deg);
-    width: 10px;
-    left: 76%;
-    top: 62%;
-    transform-origin: left top;
-
-  }
-
-  #section:hover #span-down{
-    transform: rotate(35deg);
-    width: 10px;
-    left: 73%;
-    top: 51%;
-    transform-origin: right bottom;
-  }
-
-  #nav-menu{
-    transform: scaleX(0) translateX(0%);
-    transform-origin: left center;
-    opacity: 0;
-    visibility: hidden;
-    height: 50px;
-    line-height: 50px;
-    background-color: var(--main3-color);
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
-    transition: 0.1s;
-    margin-left: -42px;
-    z-index: 2;
-  }
-
-  #section:hover #nav-menu{
-    transform: scaleX(1) translateX(0%);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  #tittle{
-    font-size: 40;
-    background-color: var(--main2-color);
-    color: var(--secondary1-color);
-  }
+.Page-title {
+    animation-duration: 10s;
+    animation-timing-function: linear;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+    animation-name: Header-coronavirus;
+    font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
+    font-size: 3.5rem;
+}

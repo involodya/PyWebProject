@@ -88,8 +88,9 @@
         {% endfor %}
     </p>
     <p>{{ form.agree() }} {{ form.agree.label }}</p>
+    <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
+    <p style="color:red">{{message}}</p>
 </form>
 </main>
 {% endblock %}

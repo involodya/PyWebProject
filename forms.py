@@ -6,6 +6,9 @@ from wtforms.validators import DataRequired
 
 
 class RegisterForm(FlaskForm):
+
+    """ форма регистрации """
+
     email = EmailField('E-mail:', validators=[DataRequired()])
     password = PasswordField('Пароль:', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль:', validators=[DataRequired()])
@@ -16,4 +19,14 @@ class RegisterForm(FlaskForm):
     education = StringField('Образование:', validators=[DataRequired()])
     speciality = StringField('Род деятельности:', validators=[DataRequired()])
     agree = BooleanField('Согласен на обработку персональных данных:', validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Зарегистрироваться')
+
+
+class LoginForm(FlaskForm):
+
+    """ форма входа на сайт """
+
+    email = EmailField('Почта', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')

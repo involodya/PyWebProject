@@ -42,13 +42,23 @@
                 <li class="nav-item"><a class="nav-link" href="/support/" style="width: 92.525px;">Support</a>
                 </li>
                 <li class="divider" aria-hidden="true"></li>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.verified %}
+                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
+                                                       style="width: 84.35px;">{{current_user.name}} {{current_user.surname}}</a></li>
+                    {% else %}
+                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
+                                                       style="width: 84.35px;">Unverified</a></li>
+                    {% endif %}
+                {% else %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="https://account.protonvpn.com"
-                                                       style="width: 84.35px;">Login</a></li>
+                                                       href="/login"
+                                                       style="width: 84.35px;">Войти</a></li>
                 <li class="nav-item" id="nav-signup"><a
                         class="nav-link btn btn-success text-uppercase"
                         href="/join"
-                        style="width: 106.025px;">Signup</a></li>
+                        style="width: 140px;">Регистрация</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

@@ -2,10 +2,11 @@ import datetime
 import sqlalchemy
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
+from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-class User(SqlAlchemyBase):
+class User(SqlAlchemyBase, UserMixin):
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -28,4 +29,6 @@ class User(SqlAlchemyBase):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
+    role = sqlalchemy.Column(sqlalchemy.String, default='user')
+    verified = sqlalchemy.Column(sqlalchemy.Boolean, autoincrement=True, default=False)
     posts = orm.relation("Posts", back_populates='user')

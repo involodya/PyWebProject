@@ -31,4 +31,4 @@ class User(SqlAlchemyBase, UserMixin):
                                      default=datetime.datetime.now)
     role = sqlalchemy.Column(sqlalchemy.String, default='user')
     verified = sqlalchemy.Column(sqlalchemy.Boolean, autoincrement=True, default=False)
-    posts = orm.relation("Posts", back_populates='user')
+    posts = orm.relation("Post", back_populates='user')

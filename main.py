@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, redirect
 from flask_login import LoginManager, login_user, login_required, logout_user
 from data import db_session
 from data.users import User
+from data.regions import Region
 from forms import RegisterForm, LoginForm
 
 app = Flask(__name__)
@@ -20,9 +21,30 @@ def main_page():
     return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
 
 
+@app.route('/regions')
+def regions():
+
+    """ Обработчик страницы со списком регионов """
+
+    session = db_session.create_session()
+    regions = session.query(Region).all()
+    return render_template('regions.html', title='Регионы', regions=regions,
+                           css=url_for('static', filename='css/regions_style.css'))
+
+
+@app.route('/regions/<region_id>')
+def region(region_id):
+
+    """ Обработчик страницы региона """
+
+    session = db_session.create_session()
+    region = session.query(Region).filter(Region.id == region_id).first()
+    return render_template('region.html', title=region.name, region=region,
+                           css=url_for('static', filename='css/region_style.css'))
+
+
 @app.route('/join', methods=['GET', 'POST'])
 def join():
-
     """ обработчик регистрации пользователя """
 
     form = RegisterForm()
@@ -57,7 +79,6 @@ def join():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     """ обратчик страницы с авторизацией """
 
     form = LoginForm()
@@ -77,7 +98,6 @@ def login():
 
 @login_manager.user_loader
 def load_user(user_id):
-
     """ обработчик входа пользователя """
 
     session = db_session.create_session()
@@ -87,7 +107,6 @@ def load_user(user_id):
 @app.route('/logout')
 @login_required
 def logout():
-
     """ обработчик выхода пользователя """
 
     logout_user()

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" type="text/css"
+          href="https://protonvpn.com/assets/css/bootstrap.css?rel=1585324548038">
+    <link rel="stylesheet" type="text/css"
+          href="https://protonvpn.com/assets/css/main.css?rel=1585324548042">
+    <link rel="stylesheet" href={{ css }}/>
+</head>
+<body>
+<nav class="navbar navbar-toggleable-md navbar-inverse active" id="navbar-main"
+     style="background: rgb(32, 33, 38);">
+    <div class="container">
+        <a class="navbar-brand active" href="./">
+            <div class="Page-title">
+                <img width=50px
+                     src="https://psv4.userapi.com/c856216/u232185236/docs/d18/899c27e01641/TheVirus-AgAD8gEAAladvQo.gif"
+                     alt=🦠>Коронавирус<img width=50px
+                                            src="https://psv4.userapi.com/c856332/u232185236/docs/d7/7107c965851a/TheVirus-AgADzgEAAladvQo.gif"
+                                            alt=🦠>
+            </div>
+            <em></em><i></i>
+        </a>
+        <div class="navbar-dark d-xl-none ml-auto">
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbar-mobile" aria-controls="navbar-mobile" aria-expanded="false"
+                    aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="d-none d-xl-flex ml-auto" id="navbarSupportedContent">
+            <ul class="navbar-nav flex-row ml-auto">
+                <li class="nav-item"><a class="nav-link" href="about"
+                                        style="width: 79.2px;">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/regions" style="width: 99.175px;">Регионы</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/blog/"
+                                        style="width: 70.025px;">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="/support/" style="width: 92.525px;">Support</a>
+                </li>
+                <li class="divider" aria-hidden="true"></li>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.verified %}
+                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
+                                                       style="width: 84.35px;">{{current_user.name}} {{current_user.surname}}</a></li>
+                    {% else %}
+                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
+                                                       style="width: 84.35px;">Unverified</a></li>
+                    {% endif %}
+                {% else %}
+                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
+                                                       href="/login"
+                                                       style="width: 84.35px;">Войти</a></li>
+                <li class="nav-item" id="nav-signup"><a
+                        class="nav-link btn btn-success text-uppercase"
+                        href="/join"
+                        style="width: 140px;">Регистрация</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>

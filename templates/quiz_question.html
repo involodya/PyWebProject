@@ -1,0 +1,10 @@
+{% extends "base_quiz.html" %}
+
+{% block content %}
+    <div id="middle">
+        <h1>Вопрос {{ question_number }}</h1>
+        <p>{{ question }}</p>
+        <a href="{{ next_page + '/' + answers[0] }}">{{ answers[0] }}</a>
+        <a href="{{ next_page + '/' + answers[1] }}">{{ answers[1] }}</a>
+    </div>
+{% endblock %}

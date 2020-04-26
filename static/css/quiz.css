@@ -1,0 +1,53 @@
+#middle{
+    width: 50%;
+    left: 25%;
+    position: relative;
+}
+
+#middle > h1{
+    color: #222222;
+}
+
+#middle > h2{
+    color: #222222;
+    font-size: 20px;
+    margin: 0px;
+}
+
+#middle > p{
+    color: #333333;
+}
+
+#middle > a{
+    position: relative;
+    padding: 10px;
+    color: white;
+    background-color: #535efd;
+    border-radius: 20px;
+    display: block;
+    margin: 10px;
+}
+
+#middle > a:hover{
+    text-decoration: none;
+    background-color: #7B68EE;
+    color: #f2f2f2;
+}
+
+.wrong{
+    animation: wrong 2s;
+}
+
+@keyframes wrong {
+    from {background-color: red;}
+    to {background-color: white;}
+}
+
+.right{
+    animation: right 2s;
+}
+
+@keyframes right {
+    from {background-color: green;}
+    to {background-color: white;}
+}

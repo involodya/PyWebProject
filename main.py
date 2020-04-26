@@ -4,6 +4,7 @@ from data import db_session
 from data.users import User
 from data.regions import Region
 from forms import RegisterForm, LoginForm
+from random import shuffle
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -13,7 +14,7 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/database.sqlite")
-    app.run(port=8080, host='127.0.0.1')
+    app.run(port=8080, host='127.0.0.1', debug=True)
 
 
 @app.route('/')
@@ -23,7 +24,6 @@ def main_page():
 
 @app.route('/regions')
 def regions():
-
     """ Обработчик страницы со списком регионов """
 
     session = db_session.create_session()
@@ -34,7 +34,6 @@ def regions():
 
 @app.route('/regions/<region_id>')
 def region(region_id):
-
     """ Обработчик страницы региона """
 
     session = db_session.create_session()
@@ -94,6 +93,63 @@ def login():
                                css=url_for('static', filename='css/login_style.css'))
     return render_template('login.html', title='Авторизация', form=form,
                            css=url_for('static', filename='css/login_style.css'))
+
+
+@app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
+def quiz(question_number, status):
+    questions = [
+        {
+            'question': 'Что такое коронавирус?',
+            'right': 'Инфекционное заболевание, вызванное новым, ранее неизвестным коронавирусом',
+            'false': 'Мутировавший свиной грип'
+        },
+
+        {
+            'question': 'Как еще называют коронавирус',
+            'right': 'COVID-19',
+            'false': 'COVID-2018'
+        },
+
+        {
+            'question': 'Как в основном передается коронавирус?',
+            'right': 'В основном через капли, выделяющиеся из дыхательных путей при кашле, чихании и дыхании, а так-же через касания.',
+            'false': 'Коронавирус разносят птицы и обитающие в городах крысы.',
+        },
+
+        {
+            'question': 'Можно ли трогать руками лицо?',
+            'right': 'Нет',
+            'false': 'Да',
+            'explanation': 'Лицо, а в особенности нос и глаза, лучше не трогать руками так как быстрее всего коронавирус попалает в организм через слизистую оболочку.'
+        },
+
+        {
+            'question': 'Может ли вирус проникнуть через маску?',
+            'right': 'Может.',
+            'false': 'Не может.',
+            'explanation': 'Вирус настолько мал, что может проникнать практически через все цели, в том числе и через щели в маске. Однако коронавирус передается в основном при чихании или кашле, то есть переносится он в капельках слюны, а их маска задержать может.'
+        }]
+
+    if not question_number.isdigit():
+        return redirect('/')
+    question_number = int(question_number)
+
+    if status == 'start':
+        return render_template('start_quiz.html', next_page='/quiz/1/question')
+    elif question_number >= len(questions):
+        return render_template('quiz_end.html')
+    elif status == 'question':
+        question = questions[question_number]['question']
+        answers = [questions[question_number]['right'], questions[question_number]['false']]
+        shuffle(answers)
+        return render_template('quiz_question.html', question=question, answers=answers,
+                               next_page=f'/quiz/{question_number}', question_number=question_number)
+    else:
+        answer = status
+        return render_template('quiz_explanation.html', right=(answer == questions[question_number]['right']),
+                               next_page=f'/quiz/{question_number + 1}/question',
+                               explanation=questions[question_number]['explanation'] if 'explanation' in questions[
+                                   question_number].keys() else '', right_answer=questions[question_number]['right'])
 
 
 @login_manager.user_loader

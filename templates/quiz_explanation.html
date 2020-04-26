@@ -1,0 +1,25 @@
+{% extends "base_quiz.html" %}
+
+{% block content %}
+    <div id="middle">
+        {% if right %}
+            <h1>Правильно!</h1>
+            <script>
+                $(document).ready(function(){
+                    $("body").addClass("right");
+                });
+            </script>
+        {% else %}
+            <h1>Неправильно!</h1>
+            <h2>Правильный ответ:</h2>
+            <p>{{ right_answer }}</p>
+            <script>
+                $(document).ready(function(){
+                    $("body").addClass("wrong");
+                });
+            </script>
+        {% endif %}
+        <p>{{ explanation }}</p>
+        <a href={{ next_page }}>Далее</a>
+    </div>
+{% endblock %}

@@ -5,6 +5,7 @@ from data.users import User
 from data.regions import Region
 from forms import RegisterForm, LoginForm
 from random import shuffle
+import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -95,40 +96,32 @@ def login():
                            css=url_for('static', filename='css/login_style.css'))
 
 
+def get_quiz_questions():
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+
+    questions = cur.execute("""select * from questions""").fetchall()
+    false_answers = cur.execute("""select question_id, false_answer from false_answers""").fetchall()
+    ret = []
+
+    for i in questions:
+        ret.append(dict())
+        ret[-1]['question'] = i[1]
+        ret[-1]['right'] = i[2]
+        ret[-1]['explanation'] = i[3]
+        ret[-1]['false'] = []
+        for j in false_answers:
+            if j[0] == i[0]:
+                ret[-1]['false'].append(j[1])
+
+    return ret
+
+
+
+
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
-    questions = [
-        {
-            'question': 'Что такое коронавирус?',
-            'right': 'Инфекционное заболевание, вызванное новым, ранее неизвестным коронавирусом',
-            'false': ['Мутировавший свиной грип', 'Вирус, получившийся из-за скрещивания вирусов змей и летучих мышей']
-        },
-
-        {
-            'question': 'Как еще называют коронавирус',
-            'right': 'COVID-19',
-            'false': ['COVID-2018']
-        },
-
-        {
-            'question': 'Как в основном передается коронавирус?',
-            'right': 'В основном через капли, выделяющиеся из дыхательных путей при кашле, чихании и дыхании, а так-же через касания.',
-            'false': ['Коронавирус разносят птицы и обитающие в городах крысы.', 'Через канализацию']
-        },
-
-        {
-            'question': 'Можно ли трогать руками лицо?',
-            'right': 'Нет',
-            'false': ['Да'],
-            'explanation': 'Лицо, а в особенности нос и глаза, лучше не трогать руками так как быстрее всего коронавирус попадает в организм через слизистую оболочку.'
-        },
-
-        {
-            'question': 'Может ли вирус проникнуть через маску?',
-            'right': 'Может.',
-            'false': ['Не может.'],
-            'explanation': 'Вирус настолько мал, что может проникнать практически через все щели, в том числе и через щели в маске. Однако коронавирус передается в основном при чихании или кашле, то есть переносится он в капельках слюны, а их маска задержать может.'
-        }]
+    questions = get_quiz_questions()
 
     if not question_number.isdigit():
         return redirect('/')

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, session
 from flask_login import LoginManager, login_user, login_required, logout_user
 from data import db_session
 from data.users import User
@@ -135,21 +135,31 @@ def quiz(question_number, status):
     question_number = int(question_number)
 
     if status == 'start':
-        return render_template('start_quiz.html', next_page='/quiz/1/question')
+        session['answer_list'] = [-1] * len(questions)
+        return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'])
     elif question_number >= len(questions):
-        return render_template('quiz_end.html')
+        return render_template('quiz_end.html', answer_list=session['answer_list'])
     elif status == 'question':
         question = questions[question_number]['question']
         answers = [questions[question_number]['right'], questions[question_number]['false']]
         shuffle(answers)
         return render_template('quiz_question.html', question=question, answers=answers,
-                               next_page=f'/quiz/{question_number}', question_number=question_number)
+                               next_page=f'/quiz/{question_number}', question_number=question_number,
+                               answer_list=session['answer_list'])
     else:
         answer = status
-        return render_template('quiz_explanation.html', right=(answer == questions[question_number]['right']),
+
+        right = answer == questions[question_number]['right']
+        if right:
+            session['answer_list'][question_number] = 1
+        else:
+            session['answer_list'][question_number] = 0
+
+        return render_template('quiz_explanation.html', right=right,
                                next_page=f'/quiz/{question_number + 1}/question',
                                explanation=questions[question_number]['explanation'] if 'explanation' in questions[
-                                   question_number].keys() else '', right_answer=questions[question_number]['right'])
+                                   question_number].keys() else '', right_answer=questions[question_number]['right'],
+                               answer_list=session['answer_list'])
 
 
 @login_manager.user_loader

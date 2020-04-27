@@ -3,6 +3,7 @@
 {% block content2 %}
     <h1>Вопрос {{ question_number + 1 }}</h1>
     <p>{{ question }}</p>
-    <a href="{{ next_page + '/' + answers[0] }}">{{ answers[0] }}</a>
-    <a href="{{ next_page + '/' + answers[1] }}">{{ answers[1] }}</a>
+    {% for answer in answers %}
+        <a href="{{ next_page + '/' + answers[loop.index - 1] }}">{{ answer }}</a>
+    {% endfor %}
 {% endblock %}

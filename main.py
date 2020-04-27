@@ -101,32 +101,32 @@ def quiz(question_number, status):
         {
             'question': 'Что такое коронавирус?',
             'right': 'Инфекционное заболевание, вызванное новым, ранее неизвестным коронавирусом',
-            'false': 'Мутировавший свиной грип'
+            'false': ['Мутировавший свиной грип', 'Вирус, получившийся из-за скрещивания вирусов змей и летучих мышей']
         },
 
         {
             'question': 'Как еще называют коронавирус',
             'right': 'COVID-19',
-            'false': 'COVID-2018'
+            'false': ['COVID-2018']
         },
 
         {
             'question': 'Как в основном передается коронавирус?',
             'right': 'В основном через капли, выделяющиеся из дыхательных путей при кашле, чихании и дыхании, а так-же через касания.',
-            'false': 'Коронавирус разносят птицы и обитающие в городах крысы.',
+            'false': ['Коронавирус разносят птицы и обитающие в городах крысы.', 'Через канализацию']
         },
 
         {
             'question': 'Можно ли трогать руками лицо?',
             'right': 'Нет',
-            'false': 'Да',
+            'false': ['Да'],
             'explanation': 'Лицо, а в особенности нос и глаза, лучше не трогать руками так как быстрее всего коронавирус попадает в организм через слизистую оболочку.'
         },
 
         {
             'question': 'Может ли вирус проникнуть через маску?',
             'right': 'Может.',
-            'false': 'Не может.',
+            'false': ['Не может.'],
             'explanation': 'Вирус настолько мал, что может проникнать практически через все щели, в том числе и через щели в маске. Однако коронавирус передается в основном при чихании или кашле, то есть переносится он в капельках слюны, а их маска задержать может.'
         }]
 
@@ -141,7 +141,7 @@ def quiz(question_number, status):
         return render_template('quiz_end.html', answer_list=session['answer_list'])
     elif status == 'question':
         question = questions[question_number]['question']
-        answers = [questions[question_number]['right'], questions[question_number]['false']]
+        answers = [questions[question_number]['right'], *questions[question_number]['false']]
         shuffle(answers)
         return render_template('quiz_question.html', question=question, answers=answers,
                                next_page=f'/quiz/{question_number}', question_number=question_number,

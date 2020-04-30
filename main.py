@@ -4,6 +4,9 @@ from data import db_session
 from data.users import User
 from data.regions import Region
 from forms import RegisterForm, LoginForm
+from werkzeug.utils import secure_filename
+import os
+from PIL import Image
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -72,6 +75,44 @@ def join():
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
+
+        # добавим аватар, если пользователь загрузил его
+
+        if bool(form.avatar.data):
+            f = form.avatar.data
+            type = f.filename.split('.')[-1]
+            filename = f'user_avatar_{user.id}.{type}'
+            f.save(os.path.join(
+                'static', 'avatars', filename
+            ))
+
+            #  сделаем аватар квадратным
+
+            im = Image.open(os.path.join(
+                'static', 'avatars', filename
+            ))
+            pixels = im.load()  # список с пикселями
+            x, y = im.size
+            if x > y:
+                size = y
+            else:
+                size = x
+            avatar = Image.new('RGB', (size, size), (0, 0, 0))
+            av_pixels = avatar.load()
+
+            # фото обрезается по центру
+
+            dx = (x - size) // 2
+            dy = (y - size) // 2
+
+            for i in range(size):
+                for j in range(size):
+                    r, g, b = pixels[i + dx, j + dy]
+                    av_pixels[i, j] = r, g, b
+            avatar.save(os.path.join(
+                'static', 'avatars', filename
+            ))
+
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,
                            css=url_for('static', filename='css/join_style.css'))

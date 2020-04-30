@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms import IntegerField, BooleanField
+from wtforms import IntegerField, BooleanField, FileField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
@@ -19,6 +19,7 @@ class RegisterForm(FlaskForm):
     education = StringField('Образование:', validators=[DataRequired()])
     speciality = StringField('Род деятельности:', validators=[DataRequired()])
     agree = BooleanField('Согласен на обработку персональных данных:', validators=[DataRequired()])
+    avatar = FileField('Загрузите фото профиля')
     submit = SubmitField('Зарегистрироваться')
 
 

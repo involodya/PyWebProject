@@ -1,9 +1,10 @@
 from flask import Flask, render_template, url_for, redirect
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.regions import Region
-from forms import RegisterForm, LoginForm
+from data.posts import Post
+from forms import RegisterForm, LoginForm, PostForm
 from werkzeug.utils import secure_filename
 import os
 from PIL import Image
@@ -21,12 +22,43 @@ def main():
 
 @app.route('/')
 def main_page():
+    """ обработчик главной страницы """
+
     return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
+
+
+@app.route("/blog")
+def index():
+    """ Обработчик страницы с блогом """
+
+    session = db_session.create_session()
+    posts = session.query(Post).all()
+    posts = sorted(posts, key=lambda x: x.created_date, reverse=True)
+    return render_template("blog.html", posts=posts, title='Блог',
+                           css=url_for('static', filename='css/blog_style.css'))
+
+
+@app.route('/post', methods=['GET', 'POST'])
+@login_required
+def add_post():
+    """ Обработчик страницы создания поста """
+
+    form = PostForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        post = Post()
+        post.title = form.title.data
+        post.content = form.content.data
+        current_user.posts.append(post)
+        session.merge(current_user)
+        session.commit()
+        return redirect('/blog')
+    return render_template('post.html', title='Новый пост',
+                           form=form, css=url_for('static', filename='css/post_style.css'))
 
 
 @app.route('/regions')
 def regions():
-
     """ Обработчик страницы со списком регионов """
 
     session = db_session.create_session()
@@ -37,7 +69,6 @@ def regions():
 
 @app.route('/regions/<region_id>')
 def region(region_id):
-
     """ Обработчик страницы региона """
 
     session = db_session.create_session()
@@ -72,6 +103,7 @@ def join():
             education=form.education.data,
             speciality=form.speciality.data
         )
+
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
@@ -112,6 +144,13 @@ def join():
             avatar.save(os.path.join(
                 'static', 'avatars', filename
             ))
+
+            session = db_session.create_session()
+            user = session.query(User).filter(User.id == user.id).first()
+            user.avatar = os.path.join(
+                'static', 'avatars', filename
+            )
+            session.commit()
 
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,

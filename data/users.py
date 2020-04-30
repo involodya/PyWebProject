@@ -31,4 +31,5 @@ class User(SqlAlchemyBase, UserMixin):
                                      default=datetime.datetime.now)
     role = sqlalchemy.Column(sqlalchemy.String, default='user')
     verified = sqlalchemy.Column(sqlalchemy.Boolean, autoincrement=True, default=False)
+    avatar = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     posts = orm.relation("Post", back_populates='user')

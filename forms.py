@@ -1,12 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms import IntegerField, BooleanField, FileField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
 
 class RegisterForm(FlaskForm):
-
     """ форма регистрации """
 
     email = EmailField('E-mail:', validators=[DataRequired()])
@@ -24,10 +23,17 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-
     """ форма входа на сайт """
 
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+
+
+class PostForm(FlaskForm):
+    """ форма создания поста """
+
+    title = StringField('Заголовок', validators=[DataRequired()])
+    content = TextAreaField("Содержание")
+    submit = SubmitField('Запостить')

@@ -155,18 +155,18 @@ def quiz(question_number, status):
         session['answer_list'] = [-1] * len(questions)
         return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'])
     elif question_number >= len(questions):
-        return render_template('quiz_end.html', answer_list=session['answer_list'])
+        return render_template('quiz_end.html')
     elif status == 'question':
         question = questions[question_number]['question']
         answers = [questions[question_number]['right'], *questions[question_number]['false']]
         shuffle(answers)
-        return render_template('quiz_question.html', question=question, answers=answers,
+        return render_template('quiz_question.html', question=question, answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}', question_number=question_number,
                                answer_list=session['answer_list'])
     else:
         answer = status
 
-        right = answer == questions[question_number]['right']
+        right = str(answer) == str(questions[question_number]['right'])
         if right:
             session['answer_list'][question_number] = 1
         else:

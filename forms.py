@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms import IntegerField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
@@ -30,3 +30,14 @@ class LoginForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+
+
+class MakeQuestionForm(FlaskForm):
+
+    """ форма создания вопроса для викторины """
+
+    question = StringField('Вопрос', validators=[DataRequired()])
+    right_answer = StringField('Правильный ответ', validators=[DataRequired()])
+    false_answers = TextAreaField('Неправильныу ответы', validators=[DataRequired()])
+    explanation = StringField('Пояснение')
+    submit = SubmitField('Создать вопрос')

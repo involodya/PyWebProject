@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user
 from data import db_session
 from data.users import User
 from data.regions import Region
-from forms import RegisterForm, LoginForm
+from forms import RegisterForm, LoginForm, MakeQuestionForm
 from random import shuffle
 import sqlite3
 
@@ -114,9 +114,33 @@ def get_quiz_questions():
             if j[0] == i[0]:
                 ret[-1]['false'].append(j[1])
 
+    con.commit()
+
     return ret
 
 
+@app.route('/quiz/add_question', methods=['GET', 'POST'])
+def add_question():
+    form = MakeQuestionForm()
+    if form.validate_on_submit():
+        con = sqlite3.connect("db/quiz_questions.db")
+        cur = con.cursor()
+        s = f'insert into questions(question, right_answer, explanation) values("{form.question.data}", "{form.right_answer.data}", "{form.explanation.data}")'
+        cur.execute(s)
+
+        s = f'select id from questions where right_answer = "{form.right_answer.data}"'
+        id = cur.execute(s).fetchall()[0][0]
+
+        for false_answer in form.false_answers.data.split('\n'):
+            false_answer = false_answer.strip(chr(13))
+            s = """insert into false_answers(question_id, false_answer) values(""" + str(id) + ', ' + '\'' + false_answer + '\')'
+            cur.execute(s)
+
+        con.commit()
+
+        return redirect('/')
+
+    return render_template('quiz_add_question.html', form=form)
 
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
@@ -153,6 +177,7 @@ def quiz(question_number, status):
                                explanation=questions[question_number]['explanation'] if 'explanation' in questions[
                                    question_number].keys() else '', right_answer=questions[question_number]['right'],
                                answer_list=session['answer_list'])
+
 
 
 @login_manager.user_loader

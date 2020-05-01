@@ -1,11 +1,11 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, request, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.regions import Region
 from data.posts import Post
 from forms import RegisterForm, LoginForm, PostForm
-from werkzeug.utils import secure_filename
+import datetime
 import os
 from PIL import Image
 
@@ -49,12 +49,68 @@ def add_post():
         post = Post()
         post.title = form.title.data
         post.content = form.content.data
+        post.string_created_date = str(datetime.datetime.now())[0:16]
         current_user.posts.append(post)
         session.merge(current_user)
         session.commit()
         return redirect('/blog')
     return render_template('post.html', title='Новый пост',
                            form=form, css=url_for('static', filename='css/post_style.css'))
+
+
+@app.route('/post/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(id):
+    """ Обработчик страницы редактирования поста """
+
+    form = PostForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        if current_user.role == 'admin':
+            post = session.query(Post).filter(Post.id == id).first()
+        else:
+            post = session.query(Post).filter(Post.id == id,
+                                              Post.user == current_user).first()
+        if post:
+            form.title.data = post.title
+            form.content.data = post.content
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        if current_user.role == 'admin':
+            post = session.query(Post).filter(Post.id == id).first()
+        else:
+            post = session.query(Post).filter(Post.id == id,
+                                              Post.user == current_user).first()
+        if post:
+            post.title = form.title.data
+            post.content = form.content.data
+            session.commit()
+            return redirect('/blog')
+        else:
+            abort(404)
+    return render_template('post.html', title='Редактирование поста',
+                           form=form, css=url_for('static', filename='css/post_style.css'))
+
+
+@app.route('/post_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def post_delete(id):
+    """ обработчик удаления поста """
+
+    session = db_session.create_session()
+    if current_user.role == 'admin':
+        post = session.query(Post).filter(Post.id == id).first()
+    else:
+        post = session.query(Post).filter(Post.id == id,
+                                          Post.user == current_user).first()
+    if post:
+        session.delete(post)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/blog')
 
 
 @app.route('/regions')

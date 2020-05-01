@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 align="center">Регионы РФ</h1>
+    <div  style="width:60%;margin:auto;">
+        <table border="1" width="100%">
+           <tr>
+               <th width="40%">Регион</th>
+               <th width="20%">Подтверждено</th>
+               <th width="20%">Выздоровело</th>
+               <th width="20%">Летальные исходы</th>
+           </tr>
+            {% for item in regions %}
+            <tr>
+                <td style="text-align:center;"><a href="/regions/{{item.id}}">{{item.name}}</a></td>
+               <td>{{item.cases}}</td>
+               <td>{{item.cured}}</td>
+               <td>{{item.deaths}}</td>
+           </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

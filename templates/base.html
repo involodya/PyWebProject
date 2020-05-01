@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Яндекс простит</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" type="text/css"
           href="https://protonvpn.com/assets/css/bootstrap.css?rel=1585324548038">
     <link rel="stylesheet" type="text/css"
@@ -15,11 +15,7 @@
     <div class="container">
         <a class="navbar-brand active" href="./">
             <div class="Page-title">
-                <img width=50px
-                     src="https://psv4.userapi.com/c856216/u232185236/docs/d18/899c27e01641/TheVirus-AgAD8gEAAladvQo.gif"
-                     alt=🦠>Коронавирус<img width=50px
-                                            src="https://psv4.userapi.com/c856332/u232185236/docs/d7/7107c965851a/TheVirus-AgADzgEAAladvQo.gif"
-                                            alt=🦠>
+                COVID-19
             </div>
             <em></em><i></i>
         </a>
@@ -33,42 +29,41 @@
             <ul class="navbar-nav flex-row ml-auto">
                 <li class="nav-item"><a class="nav-link" href="about"
                                         style="width: 79.2px;">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="secure-vpn" style="width: 99.175px;">Features</a>
+                <li class="nav-item"><a class="nav-link" href="/regions" style="width: 99.175px;">Регионы</a>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="/blog/"
-                                        style="width: 70.025px;">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="/blog"
+                                        style="width: 70.025px;">Блог</a></li>
                 <li class="nav-item"><a class="nav-link" href="/support/" style="width: 92.525px;">Support</a>
                 </li>
                 <li class="divider" aria-hidden="true"></li>
+                {% if current_user.is_authenticated %}
+                {% if current_user.verified %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="https://account.protonvpn.com"
-                                                       style="width: 84.35px;">Login</a></li>
+                                                       href="/logout"
+                                                       style="width: 84.35px;">{{current_user.name}}
+                    {{current_user.surname}}</a></li>
+                {% else %}
+                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
+                                                       href="/logout"
+                                                       style="width: 84.35px;">Unverified</a></li>
+                {% endif %}
+                {% else %}
+                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
+                                                       href="/login"
+                                                       style="width: 84.35px;">Войти</a></li>
                 <li class="nav-item" id="nav-signup"><a
                         class="nav-link btn btn-success text-uppercase"
-                        href="https://account.protonvpn.com/signup"
-                        style="width: 106.025px;">Signup</a></li>
+                        href="/join"
+                        style="width: 140px;">Регистрация</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
-<div class="Main-content">
-    <section class="Content-unit">
-        <iframe frameborder="0" width=1100 height=920
-                src="https://yastat.net/s3/milab/2020/podomam/map/index.html"
-                allowfullscreen></iframe>
-    </section>
-    <section class="Content-unit">
-        <iframe frameborder="0" width=800 height=720
-                src="https://yastat.net/s3/milab/2020/podomam/bars/index.html"
-                allowfullscreen></iframe>
-    </section>
-    <section class="Content-unit">
-        <iframe frameborder="0" width=900 height=780
-                src="https://yastat.net/s3/milab/2020/podomam/diff/index.html"
-                allowfullscreen></iframe>
-    </section>
-</div>
+
+{% block content %}{% endblock %}
+
 </body>
 </html>

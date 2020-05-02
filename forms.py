@@ -36,4 +36,15 @@ class PostForm(FlaskForm):
 
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField("Содержание")
+    attachment = FileField('Прикрепить фото')
     submit = SubmitField('Запостить')
+
+
+class MakeQuestionForm(FlaskForm):
+    """ форма создания вопроса для викторины """
+
+    question = StringField('Вопрос', validators=[DataRequired()])
+    right_answer = StringField('Правильный ответ', validators=[DataRequired()])
+    false_answers = TextAreaField('Неправильныу ответы', validators=[DataRequired()])
+    explanation = StringField('Пояснение')
+    submit = SubmitField('Создать вопрос')

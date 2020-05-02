@@ -1,21 +1,14 @@
-from flask import Flask, render_template, url_for, redirect, request, abort, session
 import sqlite3
-from data import db_session
-from data.users import User
-from data.regions import Region
-
-from data.posts import Post
 import datetime
 import os
-
 from PIL import Image
 from data.posts import Post
 from data.regions import Region
 from data.users import User
-from flask import Flask, render_template, url_for, redirect, request, abort
+from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms import RegisterForm, LoginForm, PostForm
-
+from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm
+from random import shuffle
 from data import db_session
 
 app = Flask(__name__)
@@ -180,9 +173,7 @@ def post_dislike(id):
             session[name_dislike] = 1
         else:
             abort(404)
-    # return redirect('/blog') !
-    return render_template('home.html', title='Коронавирус',
-                           css=url_for('static', filename='css/home_style.css'))
+    return redirect('/blog')
 
 
 @app.route('/regions')
@@ -209,7 +200,7 @@ def region(region_id):
 def join():
     """ обработчик регистрации пользователя """
 
-    def send_started_email(name, acc_login, acc_password, toAdr='kpvcha4@yandex.ru'):
+    def send_started_email(name, acc_login, acc_password, toAdr):
         import imaplib
         import smtplib
         login = 'yourmesseger@yandex.ru'
@@ -374,7 +365,7 @@ def join():
             user = session.query(User).filter(User.id == user.id).first()
             user.avatar = "/../static/avatars/user_avatar_default.jpg"
             session.commit()
-        send_started_email(form.name.data, form.email.data, form.password.data)
+        send_started_email(form.name.data, form.email.data, form.password.data, form.email.data)
 
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,

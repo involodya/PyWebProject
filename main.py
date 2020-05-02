@@ -53,6 +53,18 @@ def add_post():
         current_user.posts.append(post)
         session.merge(current_user)
         session.commit()
+        if bool(form.attachment.data):
+            session = db_session.create_session()
+            post = session.query(Post).order_by(Post.id.desc()).first()
+            f = form.attachment.data
+            type = f.filename.split('.')[-1]
+            filename = f'post_attachment_{post.id}.{type}'
+            path = os.path.join(
+                'static', 'attachments', filename
+            )
+            f.save(path)
+            post.attachment = path
+            session.commit()
         return redirect('/blog')
     return render_template('post.html', title='Новый пост',
                            form=form, css=url_for('static', filename='css/post_style.css'))
@@ -106,6 +118,8 @@ def post_delete(id):
         post = session.query(Post).filter(Post.id == id,
                                           Post.user == current_user).first()
     if post:
+        if post.attachment:
+            os.remove(post.attachment)
         session.delete(post)
         session.commit()
     else:
@@ -206,6 +220,12 @@ def join():
             user.avatar = os.path.join(
                 'static', 'avatars', filename
             )
+            session.commit()
+
+        else:
+            session = db_session.create_session()
+            user = session.query(User).filter(User.id == user.id).first()
+            user.avatar = "/../static/avatars/user_avatar_default.jpg"
             session.commit()
 
         return redirect('/login')

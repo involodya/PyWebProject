@@ -36,4 +36,5 @@ class PostForm(FlaskForm):
 
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField("Содержание")
+    attachment = FileField('Прикрепить фото')
     submit = SubmitField('Запостить')

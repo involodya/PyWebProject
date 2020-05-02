@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css"
           href="https://protonvpn.com/assets/css/main.css?rel=1585324548042">
     <link rel="stylesheet" href={{ css }}/>
+    {% block head %}{% endblock %}
+
 </head>
 <body>
 <nav class="navbar navbar-toggleable-md navbar-inverse active" id="navbar-main"
@@ -31,10 +33,19 @@
                                         style="width: 79.2px;">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="/regions" style="width: 99.175px;">Регионы</a>
                 </li>
+
                 <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="/blog"
                                         style="width: 70.025px;">Блог</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="/quiz/0/start" style="width: 99.175px;">Викторина</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/blog/"
+                                        style="width: 70.025px;">Blog</a></li>
+
                 <li class="nav-item"><a class="nav-link" href="/support/" style="width: 92.525px;">Support</a>
                 </li>
                 <li class="divider" aria-hidden="true"></li>

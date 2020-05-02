@@ -1,13 +1,21 @@
+
 from flask import Flask, render_template, url_for, redirect, request, abort, session
+
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.regions import Region
+
 from data.posts import Post
 from forms import RegisterForm, LoginForm, PostForm
 import datetime
 import os
 from PIL import Image
+
+from forms import RegisterForm, LoginForm, MakeQuestionForm
+from random import shuffle
+import sqlite3
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -17,7 +25,8 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/database.sqlite")
-    app.run(port=8080, host='127.0.0.1')
+    app.run(port=8080, host='127.0.0.1', debug=True)
+
 
 
 @app.route('/')
@@ -170,7 +179,8 @@ def post_dislike(id):
             session[name_dislike] = 1
         else:
             abort(404)
-    return redirect('/blog')
+    # return redirect('/blog') !
+    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route('/regions')
@@ -273,7 +283,6 @@ def join():
             user = session.query(User).filter(User.id == user.id).first()
             user.avatar = "/../static/avatars/user_avatar_default.jpg"
             session.commit()
-
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,
                            css=url_for('static', filename='css/join_style.css'))
@@ -296,6 +305,163 @@ def login():
                                css=url_for('static', filename='css/login_style.css'))
     return render_template('login.html', title='Авторизация', form=form,
                            css=url_for('static', filename='css/login_style.css'))
+
+
+def get_quiz_questions():
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+
+    questions = cur.execute("""select * from questions""").fetchall()
+    false_answers = cur.execute("""select question_id, false_answer from false_answers""").fetchall()
+    print('flase answers = ', false_answers)
+    ret = []
+
+    for i in questions:
+        ret.append(dict())
+        ret[-1]['id'] = i[0]
+        ret[-1]['question'] = i[1]
+        ret[-1]['right'] = i[2]
+        if i[3]:
+            ret[-1]['explanation'] = i[3]
+        else:
+            ret[-1]['explanation'] = ''
+        ret[-1]['false'] = []
+        for j in false_answers:
+            if j[0] == i[0]:
+                if j[1] != '':
+                    ret[-1]['false'].append(j[1])
+
+    con.commit()
+
+    return ret
+
+
+@app.route('/quiz/add_question', methods=['GET', 'POST'])
+def add_question():
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+
+    form = MakeQuestionForm()
+    if form.validate_on_submit():
+        con = sqlite3.connect("db/quiz_questions.db")
+        cur = con.cursor()
+        s = f'insert into questions(question, right_answer, explanation) values("{form.question.data}", "{form.right_answer.data}", "{form.explanation.data}")'
+        cur.execute(s)
+
+        s = f'select id from questions where right_answer = "{form.right_answer.data}"'
+        id = cur.execute(s).fetchall()[0][0]
+
+        for false_answer in form.false_answers.data.split('\n'):
+            false_answer = false_answer.strip(chr(13))
+            s = """insert into false_answers(question_id, false_answer) values(""" + str(
+                id) + ', ' + '\'' + false_answer + '\')'
+            cur.execute(s)
+
+        con.commit()
+
+        return redirect('/')
+
+    return render_template('quiz_add_question.html', form=form)
+
+
+@app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
+           methods=['GET', 'POST'])
+def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, explanation):
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    if not current_user.verified:
+        return redirect('/')
+    if explanation == 'none':
+        explanation = ''
+
+    question = question.replace('⁂', '?')
+    right_answer = right_answer.replace('⁂', '?')
+    false_answers = false_answers.replace('⁂', '?')
+    explanation = explanation.replace('⁂', '?')
+
+    question = question.replace('⊕', '\n')
+    right_answer = right_answer.replace('⊕', '\n')
+    false_answers = false_answers.replace('⊕', '\n')
+    explanation = explanation.replace('⊕', '\n')
+
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+    s = f'update questions set(question, right_answer, explanation) = ("{question}", "{right_answer}", "{explanation}") where id == {question_id}'
+    cur.execute(s)
+
+    s = f'delete from false_answers where question_id == {question_id}'
+    cur.execute(s)
+
+    for false_answer in false_answers.split('\n'):
+        s = f'insert into false_answers(question_id, false_answer) values("{question_id}", "{false_answer}")'
+        cur.execute(s)
+
+    con.commit()
+
+    return redirect(url_for('editing'))
+
+
+@app.route('/quiz/editing', methods=['GET', 'POST'])
+def editing():
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    questions = get_quiz_questions()
+    return render_template('quiz_editing.html', questions=questions, finish_flag=False)
+
+
+@app.route('/delete/<question_id>', methods=['GET', 'POST'])
+def dalete(question_id):
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+    s = f'delete from questions where id == {question_id}'
+    cur.execute(s)
+    con.commit()
+    return redirect(url_for('editing'))
+
+
+@app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
+def quiz(question_number, status):
+    questions = get_quiz_questions()
+    print(questions)
+    if not question_number.isdigit():
+        return redirect('/')
+    question_number = int(question_number)
+
+    if status == 'start':
+        session['answer_list'] = [-1] * len(questions)
+        return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'],
+                               finish_flag=True)
+    elif question_number >= len(questions):
+        return render_template('quiz_end.html', finish_flag=True, answer_list=session['answer_list'])
+    elif status == 'question':
+        question = questions[question_number]['question']
+        answers = [questions[question_number]['right'], *questions[question_number]['false']]
+        shuffle(answers)
+        return render_template('quiz_question.html', question=question, answers=[str(i) for i in answers],
+                               next_page=f'/quiz/{question_number}', question_number=question_number,
+                               answer_list=session['answer_list'], finish_flag=True)
+    else:
+        answer = status
+
+        right = str(answer) == str(questions[question_number]['right'])
+        if right:
+            session['answer_list'][question_number] = 1
+        else:
+            session['answer_list'][question_number] = 0
+
+        return render_template('quiz_explanation.html', right=right,
+                               next_page=f'/quiz/{question_number + 1}/question',
+                               explanation=questions[question_number]['explanation'] if 'explanation' in questions[
+                                   question_number].keys() else '', right_answer=questions[question_number]['right'],
+                               answer_list=session['answer_list'], finish_flag=True)
 
 
 @login_manager.user_loader

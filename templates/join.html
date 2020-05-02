@@ -3,6 +3,7 @@
 {% block content %}
 <main role="main" class="container">
 <h1>Регистрация</h1>
+
 <form action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
@@ -87,6 +88,7 @@
             </p>
         {% endfor %}
     </p>
+
     <p>
         {{ form.avatar.label }}<br>
         {{ form.avatar(class="form-control") }}<br>
@@ -96,6 +98,7 @@
             </p>
         {% endfor %}
     </p>
+
 
     <p>{{ form.agree() }} {{ form.agree.label }}</p>
     <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>

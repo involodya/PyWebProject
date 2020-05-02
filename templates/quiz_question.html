@@ -1,0 +1,9 @@
+{% extends "base_quiz.html" %}
+
+{% block content2 %}
+    <h2>Вопрос {{ question_number + 1 }}</h2>
+    <p>{{ question }}</p>
+    {% for answer in answers %}
+        <a href="{{ next_page + '/' + answers[loop.index - 1] }}">{{ answer }}</a>
+    {% endfor %}
+{% endblock %}

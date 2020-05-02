@@ -21,6 +21,7 @@ class Post(SqlAlchemyBase):
     likes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     dislikes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
 
+
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
     user = orm.relation('User')

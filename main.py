@@ -230,65 +230,6 @@ def join():
         server.sendmail(login, toAdr, text)
         server.quit()
 
-    def generate_password(m):
-        """
-        Функция генерирования стандартного пароля высокой сложности
-        :param m: длина пароля
-        :return: пароль высокой сложности
-        """
-        from random import choice
-
-        maybe = []
-        maybe.extend('qwertyupasdifghjkzxcvbnmQWERTYUPASDIFGHJKZXCVBNM0123456789')
-        vv = []
-        if m <= 56:
-            while 1:
-                for _ in range(m):
-                    f = True
-                    i = 0
-                    while 1:
-                        i += 1
-                        s = choice(maybe)
-                        if s not in vv:
-                            break
-                        if i > 2 * m:
-                            vv = []
-                            f = False
-                            break
-                    vv.append(s)
-                    if not f:
-                        break
-                vv = ''.join(vv)
-                if m >= 3:
-                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
-                        if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
-                            if [True for _ in vv if _ in '0123456789']:
-                                return ''.join(vv)
-                            else:
-                                vv = []
-                        else:
-                            vv = []
-                    else:
-                        vv = []
-                else:
-                    return ''.join(vv)
-        else:
-            while 1:
-                for _ in range(m):
-                    s = choice(maybe)
-                    vv.append(s)
-                vv = ''.join(vv)
-                if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
-                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
-                        if [True for _ in vv if _ in '23456789']:
-                            return ''.join(vv)
-                        else:
-                            vv = []
-                    else:
-                        vv = []
-                else:
-                    vv = []
-
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -392,6 +333,8 @@ def login():
 
 
 def get_quiz_questions():
+    """ получение вопросов для викторины """
+
     con = sqlite3.connect("db/quiz_questions.db")
     cur = con.cursor()
 
@@ -423,6 +366,8 @@ def get_quiz_questions():
 
 @app.route('/quiz/add_question', methods=['GET', 'POST'])
 def add_question():
+    """" добавление вопросов """
+
     if not current_user.is_authenticated or not current_user.verified:
         return redirect(url_for('main_page'))
 

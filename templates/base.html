@@ -45,15 +45,9 @@
                                         style="width: 70.025px;">.</a></li>
                 <li class="divider" aria-hidden="true"></li>
                 {% if current_user.is_authenticated %}
-                {% if current_user.verified %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
                                                        href="/logout"
                                                        style="width: 84.35px;">{{current_user.name}}</a></li>
-                {% else %}
-                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="/logout"
-                                                       style="width: 84.35px;">Unverified</a></li>
-                {% endif %}
                 {% else %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
                                                        href="/login"

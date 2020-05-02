@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, redirect, session
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.regions import Region
@@ -127,7 +127,11 @@ def get_quiz_questions():
 
 @app.route('/quiz/add_question', methods=['GET', 'POST'])
 def add_question():
-    """Проверка на то, что пользователь имеет права на редактирование вопросов"""
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
 
     form = MakeQuestionForm()
     if form.validate_on_submit():
@@ -155,8 +159,11 @@ def add_question():
 @app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
            methods=['GET', 'POST'])
 def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, explanation):
-    print(question_id, question)
-    """ Проверка нато,что пользователь имеет право редактировать викторину """
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
+    if not current_user.verified:
+        return redirect('/')
     if explanation == 'none':
         explanation = ''
 
@@ -189,12 +196,18 @@ def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, e
 
 @app.route('/quiz/editing', methods=['GET', 'POST'])
 def editing():
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
     questions = get_quiz_questions()
     return render_template('quiz_editing.html', questions=questions, finish_flag=False)
 
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
 def dalete(question_id):
+    if not current_user.is_authenticated or not current_user.verified:
+        return redirect(url_for('main_page'))
+
     con = sqlite3.connect("db/quiz_questions.db")
     cur = con.cursor()
     s = f'delete from questions where id == {question_id}'

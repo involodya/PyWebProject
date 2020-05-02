@@ -1,13 +1,10 @@
-
 from flask import Flask, render_template, url_for, redirect, request, abort, session
-
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+import sqlite3
 from data import db_session
 from data.users import User
 from data.regions import Region
 
 from data.posts import Post
-from forms import RegisterForm, LoginForm, PostForm
 import datetime
 import os
 
@@ -32,12 +29,12 @@ def main():
     app.run(port=8080, host='127.0.0.1', debug=True)
 
 
-
 @app.route('/')
 def main_page():
     """ обработчик главной страницы """
 
-    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
+    return render_template('home.html', title='Коронавирус',
+                           css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route("/blog")
@@ -184,7 +181,8 @@ def post_dislike(id):
         else:
             abort(404)
     # return redirect('/blog') !
-    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
+    return render_template('home.html', title='Коронавирус',
+                           css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route('/regions')
@@ -407,7 +405,8 @@ def get_quiz_questions():
     cur = con.cursor()
 
     questions = cur.execute("""select * from questions""").fetchall()
-    false_answers = cur.execute("""select question_id, false_answer from false_answers""").fetchall()
+    false_answers = cur.execute(
+        """select question_id, false_answer from false_answers""").fetchall()
     print('flase answers = ', false_answers)
     ret = []
 
@@ -532,16 +531,20 @@ def quiz(question_number, status):
 
     if status == 'start':
         session['answer_list'] = [-1] * len(questions)
-        return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'],
+        return render_template('start_quiz.html', next_page='/quiz/0/question',
+                               answer_list=session['answer_list'],
                                finish_flag=True)
     elif question_number >= len(questions):
-        return render_template('quiz_end.html', finish_flag=True, answer_list=session['answer_list'])
+        return render_template('quiz_end.html', finish_flag=True,
+                               answer_list=session['answer_list'])
     elif status == 'question':
         question = questions[question_number]['question']
         answers = [questions[question_number]['right'], *questions[question_number]['false']]
         shuffle(answers)
-        return render_template('quiz_question.html', question=question, answers=[str(i) for i in answers],
-                               next_page=f'/quiz/{question_number}', question_number=question_number,
+        return render_template('quiz_question.html', question=question,
+                               answers=[str(i) for i in answers],
+                               next_page=f'/quiz/{question_number}',
+                               question_number=question_number,
                                answer_list=session['answer_list'], finish_flag=True)
     else:
         answer = status
@@ -554,8 +557,10 @@ def quiz(question_number, status):
 
         return render_template('quiz_explanation.html', right=right,
                                next_page=f'/quiz/{question_number + 1}/question',
-                               explanation=questions[question_number]['explanation'] if 'explanation' in questions[
-                                   question_number].keys() else '', right_answer=questions[question_number]['right'],
+                               explanation=questions[question_number][
+                                   'explanation'] if 'explanation' in questions[
+                                   question_number].keys() else '',
+                               right_answer=questions[question_number]['right'],
                                answer_list=session['answer_list'], finish_flag=True)
 
 

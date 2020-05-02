@@ -18,6 +18,8 @@
             });
         </script>
     {% endif %}
-    <p>{{ explanation }}</p>
+    {% if explanation %}
+        <p>{{ explanation }}</p>
+    {% endif %}
     <a href={{ next_page }}>Далее</a>
 {% endblock %}

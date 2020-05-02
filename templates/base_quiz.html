@@ -15,7 +15,9 @@
                     <a class="circle" href="/quiz/{{ loop.index - 1 }}/question" style="background-color: #bbbbbb"></a>
                 {% endif %}
             {% endfor %}
-            <a href="/quiz/999999/question" style="border: none"><img class="circle" src="https://img.icons8.com/windows/32/000000/finish-flag.png"/></a>
+            {%  if finish_flag %}
+                <a href="/quiz/999999/question" style="border: none"><img class="circle" src="https://img.icons8.com/windows/32/000000/finish-flag.png"/></a>
+            {% endif %}
         </div>
         {% block content2 %}{% endblock %}
     </div>

@@ -1,0 +1,71 @@
+{% extends "base_quiz.html" %}
+
+{% block content2 %}
+    <script>
+        $(document).ready(function(){
+            $('.open-gide-button').on('click', function(){
+                image = $(this).children('img');
+                edit_question = $(this).parent().children('.edit-question');
+                if (image.attr('src') == 'https://img.icons8.com/ios-glyphs/15/000000/sort-down.png'){
+                    image.attr('src', 'https://img.icons8.com/ios-glyphs/15/000000/sort-right.png')
+                    edit_question.css('display', 'none')
+
+                }else {
+                    image.attr('src', 'https://img.icons8.com/ios-glyphs/15/000000/sort-down.png');
+                    edit_question.css('display', 'block');
+                }
+            });
+            $('.commit-question-changes').on('mouseover', function(){
+                class_ist = $(this).attr('class').split(' ');
+                s = '/quiz/editing/' + class_ist[class_ist.length - 1];
+                textarea_list = $(this).parent().find('textarea');
+                for (let i = 0; i < textarea_list.length; i++){
+                    val = $(textarea_list[i]).val();
+                    if (val == '') s += '/none';
+                    else{
+                        s += '/';
+                        for (let c of val){
+                            if (c == '?')
+                                s += '⁂';
+                            else if (c == '\n')
+                                s += '⊕';
+                            else
+                                s += c;
+                        }
+                    }
+                }
+                $(this).attr('href', s);
+            });
+        });
+    </script>
+    {% for question in questions %}
+        <div class="question">
+            <div class="open-gide-button">
+                <img src="https://img.icons8.com/ios-glyphs/15/000000/sort-right.png"/>
+                <div class="question-tittle">{{ question['question'] }}</div>
+            </div>
+            <a class="delete-question" href="/delete/{{ question['id'] }}"><img src="https://img.icons8.com/ios-glyphs/30/000000/delete-forever.png"/></a>
+            <div class="edit-question" style="display: none">
+                <div class="editing-card">
+                    <p>Вопрос: </p>
+                    <textarea style="width: 100%">{{ question['question'] }}</textarea>
+                </div>
+                <div class="editing-card">
+                    <p>Правильный ответ</p>
+                    <textarea style="width: 100%">{{ question['right'] }}</textarea>
+                </div>
+                <div class="editing-card">
+                    <p>Неправильные ответы:</p>
+                    <textarea style="width: 100%">{% for answer in question['false'] %}{{ answer }}
+{% endfor %}</textarea>
+                </div>
+                <div class="editing-card">
+                    <p>Обьяснение:</p>
+                    <textarea style="width: 100%">{{ question['explanation'] }}</textarea>
+                </div>
+                <a class="commit-question-changes {{ question['id'] }}">Применить изменения</a>
+            </div>
+        </div>
+
+    {% endfor %}
+{% endblock %}

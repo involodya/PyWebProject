@@ -102,17 +102,23 @@ def get_quiz_questions():
 
     questions = cur.execute("""select * from questions""").fetchall()
     false_answers = cur.execute("""select question_id, false_answer from false_answers""").fetchall()
+    print('flase answers = ', false_answers)
     ret = []
 
     for i in questions:
         ret.append(dict())
+        ret[-1]['id'] = i[0]
         ret[-1]['question'] = i[1]
         ret[-1]['right'] = i[2]
-        ret[-1]['explanation'] = i[3]
+        if i[3]:
+            ret[-1]['explanation'] = i[3]
+        else:
+            ret[-1]['explanation'] = ''
         ret[-1]['false'] = []
         for j in false_answers:
             if j[0] == i[0]:
-                ret[-1]['false'].append(j[1])
+                if j[1] != '':
+                    ret[-1]['false'].append(j[1])
 
     con.commit()
 
@@ -121,6 +127,8 @@ def get_quiz_questions():
 
 @app.route('/quiz/add_question', methods=['GET', 'POST'])
 def add_question():
+    """Проверка на то, что пользователь имеет права на редактирование вопросов"""
+
     form = MakeQuestionForm()
     if form.validate_on_submit():
         con = sqlite3.connect("db/quiz_questions.db")
@@ -133,7 +141,8 @@ def add_question():
 
         for false_answer in form.false_answers.data.split('\n'):
             false_answer = false_answer.strip(chr(13))
-            s = """insert into false_answers(question_id, false_answer) values(""" + str(id) + ', ' + '\'' + false_answer + '\')'
+            s = """insert into false_answers(question_id, false_answer) values(""" + str(
+                id) + ', ' + '\'' + false_answer + '\')'
             cur.execute(s)
 
         con.commit()
@@ -143,26 +152,78 @@ def add_question():
     return render_template('quiz_add_question.html', form=form)
 
 
+@app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
+           methods=['GET', 'POST'])
+def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, explanation):
+    print(question_id, question)
+    """ Проверка нато,что пользователь имеет право редактировать викторину """
+    if explanation == 'none':
+        explanation = ''
+
+    question = question.replace('⁂', '?')
+    right_answer = right_answer.replace('⁂', '?')
+    false_answers = false_answers.replace('⁂', '?')
+    explanation = explanation.replace('⁂', '?')
+
+    question = question.replace('⊕', '\n')
+    right_answer = right_answer.replace('⊕', '\n')
+    false_answers = false_answers.replace('⊕', '\n')
+    explanation = explanation.replace('⊕', '\n')
+
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+    s = f'update questions set(question, right_answer, explanation) = ("{question}", "{right_answer}", "{explanation}") where id == {question_id}'
+    cur.execute(s)
+
+    s = f'delete from false_answers where question_id == {question_id}'
+    cur.execute(s)
+
+    for false_answer in false_answers.split('\n'):
+        s = f'insert into false_answers(question_id, false_answer) values("{question_id}", "{false_answer}")'
+        cur.execute(s)
+
+    con.commit()
+
+    return redirect(url_for('editing'))
+
+
+@app.route('/quiz/editing', methods=['GET', 'POST'])
+def editing():
+    questions = get_quiz_questions()
+    return render_template('quiz_editing.html', questions=questions, finish_flag=False)
+
+
+@app.route('/delete/<question_id>', methods=['GET', 'POST'])
+def dalete(question_id):
+    con = sqlite3.connect("db/quiz_questions.db")
+    cur = con.cursor()
+    s = f'delete from questions where id == {question_id}'
+    cur.execute(s)
+    con.commit()
+    return redirect(url_for('editing'))
+
+
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
     questions = get_quiz_questions()
-
+    print(questions)
     if not question_number.isdigit():
         return redirect('/')
     question_number = int(question_number)
 
     if status == 'start':
         session['answer_list'] = [-1] * len(questions)
-        return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'])
+        return render_template('start_quiz.html', next_page='/quiz/0/question', answer_list=session['answer_list'],
+                               finish_flag=True)
     elif question_number >= len(questions):
-        return render_template('quiz_end.html')
+        return render_template('quiz_end.html', finish_flag=True, answer_list=session['answer_list'])
     elif status == 'question':
         question = questions[question_number]['question']
         answers = [questions[question_number]['right'], *questions[question_number]['false']]
         shuffle(answers)
         return render_template('quiz_question.html', question=question, answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}', question_number=question_number,
-                               answer_list=session['answer_list'])
+                               answer_list=session['answer_list'], finish_flag=True)
     else:
         answer = status
 
@@ -176,8 +237,7 @@ def quiz(question_number, status):
                                next_page=f'/quiz/{question_number + 1}/question',
                                explanation=questions[question_number]['explanation'] if 'explanation' in questions[
                                    question_number].keys() else '', right_answer=questions[question_number]['right'],
-                               answer_list=session['answer_list'])
-
+                               answer_list=session['answer_list'], finish_flag=True)
 
 
 @login_manager.user_loader

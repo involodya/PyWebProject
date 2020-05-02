@@ -13,7 +13,7 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.right_answer(placeholder='Правильные ответ', style="width: 100%") }}
+            {{ form.right_answer(placeholder='Правильный ответ', style="width: 100%") }}
             {% for error in form.right_answer.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}

@@ -10,12 +10,16 @@ from data.posts import Post
 from forms import RegisterForm, LoginForm, PostForm
 import datetime
 import os
+
 from PIL import Image
+from data.posts import Post
+from data.regions import Region
+from data.users import User
+from flask import Flask, render_template, url_for, redirect, request, abort
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms import RegisterForm, LoginForm, PostForm
 
-from forms import RegisterForm, LoginForm, MakeQuestionForm
-from random import shuffle
-import sqlite3
-
+from data import db_session
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -207,6 +211,95 @@ def region(region_id):
 def join():
     """ обработчик регистрации пользователя """
 
+    def send_started_email(name, acc_login, acc_password, toAdr='kpvcha4@yandex.ru'):
+        import imaplib
+        import smtplib
+        login = 'yourmesseger@yandex.ru'
+        password = 'passwordforyandex111'
+        server = 'imap.yandex.ru'
+        mail = imaplib.IMAP4_SSL(server)
+        mail.login(login, password)
+        SMTPserver = 'smtp.' + ".".join(server.split('.')[1:])
+
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        msg = MIMEMultipart()  # Создаём прототип сообщения
+        msg['From'] = login
+        msg['To'] = toAdr
+        msg['Subject'] = 'Регистрация в системе COVID-19'
+
+        body = render_template('started_email.html', name=str(name), login=str(acc_login),
+                               password=str(acc_password))
+        print(body)
+        msg.attach(MIMEText(body, 'html'))
+
+        server = smtplib.SMTP(SMTPserver, 587)  # отправляем
+        server.starttls()
+        server.login(login, password)
+        text = msg.as_string()
+        server.sendmail(login, toAdr, text)
+        server.quit()
+
+    def generate_password(m):
+        """
+        Функция генерирования стандартного пароля высокой сложности
+        :param m: длина пароля
+        :return: пароль высокой сложности
+        """
+        from random import choice
+
+        maybe = []
+        maybe.extend('qwertyupasdifghjkzxcvbnmQWERTYUPASDIFGHJKZXCVBNM0123456789')
+        vv = []
+        if m <= 56:
+            while 1:
+                for _ in range(m):
+                    f = True
+                    i = 0
+                    while 1:
+                        i += 1
+                        s = choice(maybe)
+                        if s not in vv:
+                            break
+                        if i > 2 * m:
+                            vv = []
+                            f = False
+                            break
+                    vv.append(s)
+                    if not f:
+                        break
+                vv = ''.join(vv)
+                if m >= 3:
+                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
+                        if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
+                            if [True for _ in vv if _ in '0123456789']:
+                                return ''.join(vv)
+                            else:
+                                vv = []
+                        else:
+                            vv = []
+                    else:
+                        vv = []
+                else:
+                    return ''.join(vv)
+        else:
+            while 1:
+                for _ in range(m):
+                    s = choice(maybe)
+                    vv.append(s)
+                vv = ''.join(vv)
+                if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
+                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
+                        if [True for _ in vv if _ in '23456789']:
+                            return ''.join(vv)
+                        else:
+                            vv = []
+                    else:
+                        vv = []
+                else:
+                    vv = []
+
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -283,6 +376,8 @@ def join():
             user = session.query(User).filter(User.id == user.id).first()
             user.avatar = "/../static/avatars/user_avatar_default.jpg"
             session.commit()
+        send_started_email(form.name.data, form.email.data, form.password.data)
+
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,
                            css=url_for('static', filename='css/join_style.css'))

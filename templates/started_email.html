@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            min-width: 500px;
+        }
+
+        h1 {
+            font-weight: bold;
+            font-size: 2.5rem;
+        }
+
+        p {
+            font-size:16px;
+            line-height:21px;
+        }
+
+        img {
+            margin-top: 15px;
+        }
+
+        .content {
+            min-width: 500px;
+            padding-left: 10%;
+            padding-right: 10%;
+            padding-top: 5%;
+            padding-bottom: 5%;
+        }
+
+        .fond {
+            background-color: #f4f4f4;
+        }
+
+        .hat {
+            background-color: #1b2024;
+            height: 100px;
+            width: auto;
+        }
+
+        .message {
+            background-color: #ffffff;
+            word-wrap: break-word;
+            border-collapse:collapse;
+            color:#333333;
+            font-size: 28px;
+            line-height: 1.13;
+            font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
+            padding-left: 10%;
+            padding-right: 10%;
+            padding-top: 5%;
+            padding-bottom: 5%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="fond">
+    <div class="content">
+        <div class="hat">
+            <a href="http://127.0.0.1:8080/">
+                <center>
+                    <img src="https://psv4.userapi.com/c856220/u232185236/docs/d3/28a05014f083/123.gif?extra=jR_7ohNGYIRFHBlpqYYV-g9TMD9G6EuinulExunOu_4cbEkIjTR6mPCZf8EilKDRh5jRmUYF-GXtTrMs9_GpvNMwdQNSV7S4XTUZSQj6vYUtPn2vy079Eidis4thL4bh_13h4qJhnMpuWDlKcfV9Z2VoxA">
+                </center>
+            </a>
+        </div>
+        <div class="message">
+            <h1>Привет, {{name}}!</h1>
+            <p>Спасибо за регистрацию на нашем ресурсе!</p>
+            <p>Ваш логин: {{login}}</p>
+            <p>Ваш пароль: {{password}}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

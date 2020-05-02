@@ -21,6 +21,10 @@ selection {
   display: block;
 }
 
+body {
+    background-color: #212529;
+}
+
 iframe {
     display: block;
     margin-top: 0px;

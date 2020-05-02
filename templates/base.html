@@ -15,9 +15,9 @@
 <nav class="navbar navbar-toggleable-md navbar-inverse active" id="navbar-main"
      style="background: rgb(32, 33, 38);">
     <div class="container">
-        <a class="navbar-brand active" href="./">
+        <a class="navbar-brand active" href="/">
             <div class="Page-title">
-                🦠Коронавирус🦠
+                COVID-19
             </div>
             <em></em><i></i>
         </a>
@@ -29,34 +29,31 @@
         </div>
         <div class="d-none d-xl-flex ml-auto" id="navbarSupportedContent">
             <ul class="navbar-nav flex-row ml-auto">
-                <li class="nav-item"><a class="nav-link" href="about"
-                                        style="width: 79.2px;">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="/regions" style="width: 99.175px;">Регионы</a>
-                </li>
-
-                <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="/blog"
                                         style="width: 70.025px;">Блог</a></li>
-
-                <li class="nav-item"><a class="nav-link" href="/quiz/0/start" style="width: 99.175px;">Викторина</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="pricing" style="width: 85.85px;">Pricing</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="/blog/"
-                                        style="width: 70.025px;">Blog</a></li>
-
-                <li class="nav-item"><a class="nav-link" href="/support/" style="width: 92.525px;">Support</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 70.025px;">.</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 70.025px;">.</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 70.025px;">.</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 70.025px;">.</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 70.025px;">.</a></li>
                 <li class="divider" aria-hidden="true"></li>
                 {% if current_user.is_authenticated %}
-                    {% if current_user.verified %}
-                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
-                                                       style="width: 84.35px;">{{current_user.name}} {{current_user.surname}}</a></li>
-                    {% else %}
-                    <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase" href="/logout"
+                {% if current_user.verified %}
+                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
+                                                       href="/logout"
+                                                       style="width: 84.35px;">{{current_user.name}}</a></li>
+                {% else %}
+                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
+                                                       href="/logout"
                                                        style="width: 84.35px;">Unverified</a></li>
-                    {% endif %}
+                {% endif %}
                 {% else %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
                                                        href="/login"

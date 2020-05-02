@@ -3,7 +3,7 @@
 {% block content2 %}
     <script>
         $(document).ready(function(){
-            $('.open-gide-button').on('click', function(){
+            $('.open-edit').on('click', function(){
                 image = $(this).children('img');
                 edit_question = $(this).parent().children('.edit-question');
                 if (image.attr('src') == 'https://img.icons8.com/ios-glyphs/15/000000/sort-down.png'){
@@ -40,7 +40,7 @@
     </script>
     {% for question in questions %}
         <div class="question">
-            <div class="open-gide-button">
+            <div class="open-edit">
                 <img src="https://img.icons8.com/ios-glyphs/15/000000/sort-right.png"/>
                 <div class="question-tittle">{{ question['question'] }}</div>
             </div>

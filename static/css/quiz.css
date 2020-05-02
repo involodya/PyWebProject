@@ -112,3 +112,10 @@ p{
 
 }
 
+.delete-question{
+    float: right;
+}
+
+.open-edit > *{
+    display: inline-block;
+}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, abort
+from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
@@ -124,6 +124,52 @@ def post_delete(id):
         session.commit()
     else:
         abort(404)
+    return redirect('/blog')
+
+
+@app.route('/post_like/<int:id>', methods=['GET', 'POST'])
+def post_like(id):
+    """ обработчик лайка (работает через куки в браузере)"""
+
+    name_like = f'post_like_{id}'
+    name_dislike = f'post_dislike_{id}'
+    if name_like in session:
+        pass
+    else:
+        dabs_session = db_session.create_session()
+        post = dabs_session.query(Post).filter(Post.id == id).first()
+        if post:
+            if name_dislike in session:
+                session.pop(name_dislike, None)
+                post.dislikes -= 1
+            post.likes += 1
+            dabs_session.commit()
+            session[name_like] = 1
+        else:
+            abort(404)
+    return redirect('/blog')
+
+
+@app.route('/post_dislike/<int:id>', methods=['GET', 'POST'])
+def post_dislike(id):
+    """ обработчик дизлайка (работает через куки в браузере)"""
+
+    name_like = f'post_like_{id}'
+    name_dislike = f'post_dislike_{id}'
+    if name_dislike in session:
+        pass
+    else:
+        dabs_session = db_session.create_session()
+        post = dabs_session.query(Post).filter(Post.id == id).first()
+        if post:
+            if name_like in session:
+                session.pop(name_like, None)
+                post.likes -= 1
+            post.dislikes += 1
+            dabs_session.commit()
+            session[name_dislike] = 1
+        else:
+            abort(404)
     return redirect('/blog')
 
 

@@ -15,6 +15,11 @@ class Post(SqlAlchemyBase):
     attachment = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
+    string_created_date = sqlalchemy.Column(sqlalchemy.String,
+                                            nullable=True)
+
+    likes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    dislikes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
 
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))

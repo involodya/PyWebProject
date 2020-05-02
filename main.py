@@ -1,13 +1,15 @@
-from flask import Flask, render_template, url_for, redirect
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data import db_session
-from data.users import User
-from data.regions import Region
-from data.posts import Post
-from forms import RegisterForm, LoginForm, PostForm
-from werkzeug.utils import secure_filename
+import datetime
 import os
+
 from PIL import Image
+from data.posts import Post
+from data.regions import Region
+from data.users import User
+from flask import Flask, render_template, url_for, redirect, request, abort
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms import RegisterForm, LoginForm, PostForm
+
+from data import db_session
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -24,7 +26,8 @@ def main():
 def main_page():
     """ обработчик главной страницы """
 
-    return render_template('home.html', title='Коронавирус', css=url_for('static', filename='css/home_style.css'))
+    return render_template('home.html', title='Коронавирус',
+                           css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route("/blog")
@@ -49,12 +52,68 @@ def add_post():
         post = Post()
         post.title = form.title.data
         post.content = form.content.data
+        post.string_created_date = str(datetime.datetime.now())[0:16]
         current_user.posts.append(post)
         session.merge(current_user)
         session.commit()
         return redirect('/blog')
     return render_template('post.html', title='Новый пост',
                            form=form, css=url_for('static', filename='css/post_style.css'))
+
+
+@app.route('/post/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(id):
+    """ Обработчик страницы редактирования поста """
+
+    form = PostForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        if current_user.role == 'admin':
+            post = session.query(Post).filter(Post.id == id).first()
+        else:
+            post = session.query(Post).filter(Post.id == id,
+                                              Post.user == current_user).first()
+        if post:
+            form.title.data = post.title
+            form.content.data = post.content
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        if current_user.role == 'admin':
+            post = session.query(Post).filter(Post.id == id).first()
+        else:
+            post = session.query(Post).filter(Post.id == id,
+                                              Post.user == current_user).first()
+        if post:
+            post.title = form.title.data
+            post.content = form.content.data
+            session.commit()
+            return redirect('/blog')
+        else:
+            abort(404)
+    return render_template('post.html', title='Редактирование поста',
+                           form=form, css=url_for('static', filename='css/post_style.css'))
+
+
+@app.route('/post_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def post_delete(id):
+    """ обработчик удаления поста """
+
+    session = db_session.create_session()
+    if current_user.role == 'admin':
+        post = session.query(Post).filter(Post.id == id).first()
+    else:
+        post = session.query(Post).filter(Post.id == id,
+                                          Post.user == current_user).first()
+    if post:
+        session.delete(post)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/blog')
 
 
 @app.route('/regions')
@@ -80,6 +139,95 @@ def region(region_id):
 @app.route('/join', methods=['GET', 'POST'])
 def join():
     """ обработчик регистрации пользователя """
+
+    def send_started_email(name, acc_login, acc_password, toAdr='kpvcha4@yandex.ru'):
+        import imaplib
+        import smtplib
+        login = 'yourmesseger@yandex.ru'
+        password = 'passwordforyandex111'
+        server = 'imap.yandex.ru'
+        mail = imaplib.IMAP4_SSL(server)
+        mail.login(login, password)
+        SMTPserver = 'smtp.' + ".".join(server.split('.')[1:])
+
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        msg = MIMEMultipart()  # Создаём прототип сообщения
+        msg['From'] = login
+        msg['To'] = toAdr
+        msg['Subject'] = 'Регистрация в системе COVID-19'
+
+        body = render_template('started_email.html', name=str(name), login=str(acc_login),
+                               password=str(acc_password))
+        print(body)
+        msg.attach(MIMEText(body, 'html'))
+
+        server = smtplib.SMTP(SMTPserver, 587)  # отправляем
+        server.starttls()
+        server.login(login, password)
+        text = msg.as_string()
+        server.sendmail(login, toAdr, text)
+        server.quit()
+
+    def generate_password(m):
+        """
+        Функция генерирования стандартного пароля высокой сложности
+        :param m: длина пароля
+        :return: пароль высокой сложности
+        """
+        from random import choice
+
+        maybe = []
+        maybe.extend('qwertyupasdifghjkzxcvbnmQWERTYUPASDIFGHJKZXCVBNM0123456789')
+        vv = []
+        if m <= 56:
+            while 1:
+                for _ in range(m):
+                    f = True
+                    i = 0
+                    while 1:
+                        i += 1
+                        s = choice(maybe)
+                        if s not in vv:
+                            break
+                        if i > 2 * m:
+                            vv = []
+                            f = False
+                            break
+                    vv.append(s)
+                    if not f:
+                        break
+                vv = ''.join(vv)
+                if m >= 3:
+                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
+                        if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
+                            if [True for _ in vv if _ in '0123456789']:
+                                return ''.join(vv)
+                            else:
+                                vv = []
+                        else:
+                            vv = []
+                    else:
+                        vv = []
+                else:
+                    return ''.join(vv)
+        else:
+            while 1:
+                for _ in range(m):
+                    s = choice(maybe)
+                    vv.append(s)
+                vv = ''.join(vv)
+                if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm'.upper()]:
+                    if [True for _ in vv if _ in 'qwertyulpasdfghjkzxcvbnm']:
+                        if [True for _ in vv if _ in '23456789']:
+                            return ''.join(vv)
+                        else:
+                            vv = []
+                    else:
+                        vv = []
+                else:
+                    vv = []
 
     form = RegisterForm()
     if form.validate_on_submit():
@@ -151,6 +299,8 @@ def join():
                 'static', 'avatars', filename
             )
             session.commit()
+
+        send_started_email(form.name.data, form.email.data, form.password.data)
 
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,

@@ -1,23 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 align="center">Регионы РФ</h1>
-    <div  style="width:60%;margin:auto;">
-        <table border="1" width="100%">
-           <tr>
-               <th width="40%">Регион</th>
-               <th width="20%">Подтверждено</th>
-               <th width="20%">Выздоровело</th>
-               <th width="20%">Летальные исходы</th>
-           </tr>
-            {% for item in regions %}
-            <tr>
-                <td style="text-align:center;"><a href="/regions/{{item.id}}">{{item.name}}</a></td>
-               <td>{{item.cases}}</td>
-               <td>{{item.cured}}</td>
-               <td>{{item.deaths}}</td>
-           </tr>
-            {% endfor %}
-        </table>
-    </div>
+<div class="Main-content">
+    <section class="Content-unit">
+        <iframe frameborder="0" width=100% height=850
+                src="https://meduza.io/embed/covid-russia-map/?api_key=api/g4/covid_data/regional_russian_map_data"
+                allowfullscreen></iframe>
+    </section>
+    <section class="Content-unit">
+        <h1 align="center">Регионы РФ</h1>
+        <div style="width:60%;margin:auto;">
+            <table border="1" width="100%">
+                <tr>
+                    <th width="40%">Регион</th>
+                    <th width="20%">Подтверждено</th>
+                    <th width="20%">Выздоровело</th>
+                    <th width="20%">Летальные исходы</th>
+                </tr>
+                {% for item in regions %}
+                <tr>
+                    <td style="text-align:center;"><a href="/regions/{{item.id}}">{{item.name}}</a>
+                    </td>
+                    <td>{{item.cases}}</td>
+                    <td>{{item.cured}}</td>
+                    <td>{{item.deaths}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+</div>
 {% endblock %}

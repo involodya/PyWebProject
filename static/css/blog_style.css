@@ -61,3 +61,7 @@ iframe {
     font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
     font-size: 3.5rem;
 }
+
+td {
+    vertical-align: top;
+}

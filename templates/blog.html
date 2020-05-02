@@ -3,22 +3,37 @@
 {% block content %}
 <main role="main" class="container">
 <h1 align="center">Записи в блоге</h1><br/>
-{% if current_user.is_authenticated %}
-    <a href="post" class="btn btn-primary">Новый пост</a><br/>
+{% if current_user.is_authenticated and current_user.verified %}
+    <a href="/post" class="btn btn-primary">Новый пост</a><br/>
 {% endif %}
     <br/>
-<table border="1" width="100%">
-            {% for item in posts %}
-            <tr>
-                <td width="200px">{{item.user.name}} {{item.user.surname}}</td>
-                <td width="800px">{{item.created_date}}</td>
-           </tr>
-            <tr>
-                <td width="200px" height="230px"><img src="{{item.user.avatar}}" width="100%" height="100%" ></td>
-                <td width="800px">{{item.content}}</td>
-           </tr>
-
-            {% endfor %}
-        </table>
+{% for item in posts %}
+    <table border="1" width="100%">
+        <tr>
+            <td width="200px">{{item.user.name}} {{item.user.surname}}</td>
+            <td width="800px">{{item.string_created_date}}</td>
+        </tr>
+        <tr>
+            <td width="200px" height="230px"><img src="{{item.user.avatar}}" width="100%" height="100%" ></td>
+            <td width="800px">
+                <h2>{{item.title}}</h2>
+                <p>{{item.content}}</p>
+            </td>
+        </tr>
+        <tr>
+            <td>{{item.user.about}}</td>
+            <td>
+                <div style="float:left;">
+                    <a href="/" class="btn btn-primary" style="background-color: green;">👍 {{item.likes}}</a>
+                    <a href="/" class="btn btn-primary" style="background-color: red;">👎 {{item.dislikes}}</a>
+                    {% if current_user.is_authenticated and (current_user == item.user or current_user.role == 'admin')%}
+                    <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>
+                    <a href="/post_delete/{{item.id}}" class="btn btn-danger">Удалить</a>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    </table><br/>
+{% endfor %}
 </main>
 {% endblock %}

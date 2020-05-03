@@ -11,9 +11,24 @@
     'static', filename='css/base_style.css') }}/>
     <link rel="stylesheet" href={{ css }}/>
     {% block head %}{% endblock %}
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 </head>
 <body>
+<script>
+    $(document).ready(function(){
+        $('#checkout-button').click(function(){
+            circle = $('#circle');
+            if (circle.attr('class') == 'circle-left'){
+                circle.attr('class', 'circle-right');
+                circle.attr('src', 'https://img.icons8.com/ios-filled/20/000000/crescent-moon.png')
+            }
+            else{
+                circle.attr('class','circle-left');
+                circle.attr('src', 'https://img.icons8.com/android/20/000000/sun.png');
+            }
+        });
+    });
+</script>
 {% if theme == 'dark' %}
     <script>
         html = document.querySelector('html');
@@ -86,6 +101,17 @@
                         href="/join"
                         style="width: 140px;">Регистрация</a></li>
                 {% endif %}
+                <a href="/change_theme">
+                    {% if theme == 'white' %}
+                        <div id="checkout-button">
+                            <img id="circle" class="circle-left" src="https://img.icons8.com/android/20/000000/sun.png"/>
+                        </div>
+                    {% else %}
+                        <div id="checkout-button">
+                            <img id="circle" class="circle-right" src="https://img.icons8.com/ios-filled/20/000000/crescent-moon.png"/>
+                        </div>
+                    {% endif %}
+                </a>
             </ul>
         </div>
     </div>

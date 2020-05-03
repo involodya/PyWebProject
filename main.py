@@ -522,6 +522,15 @@ def dalete(question_id):
     return redirect(url_for('editing'))
 
 
+@app.route('/change_theme')
+def change_theme():
+    if get_theme() == 'white':
+        session['theme'] = 'dark'
+    else:
+        session['theme'] = 'white'
+    return redirect('/')
+
+
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
     global quiz_results, questions_id

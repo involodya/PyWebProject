@@ -64,3 +64,29 @@ iframe {
     font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
     font-size: 3.5rem;
 }
+
+#checkout-button{
+  height: 40px;
+  width: 80px;
+  box-sizing: border-box;
+  border: 5px solid #444444;
+  border-radius: 20px;
+  background-color: #999999;
+}
+
+#circle{
+  padding: 5px;
+  transition: 0.2s;
+  border-radius: 50%;
+  position: relative;
+}
+
+.circle-left{
+  background-color: #ff9900;
+  left: 0px;
+}
+
+.circle-right{
+  background-color: white;
+  left: 40px;
+}

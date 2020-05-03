@@ -1,9 +1,8 @@
-:root {
-    --text-color: #444444;
-    --blue-color: #535efd;
-    --purple-color: #7B68EE;
+*{
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
 }
-
 
 #middle{
     width: 50%;
@@ -28,7 +27,7 @@ p{
     position: relative;
     padding: 10px;
     color: white;
-    background-color: var(--blue-color);
+    background-color: var(--quiz-a-color);
     border-radius: 20px;
     display: block;
     margin: 10px;
@@ -36,26 +35,28 @@ p{
 
 #middle > a:hover{
     text-decoration: none;
-    background-color: var(--purple-color);
+    background-color: var(--quiz-a-hover-color);
     color: #f2f2f2;
 }
 
 .wrong{
     animation: wrong 2s;
+    background-color: var(--background-color);
 }
 
 @keyframes wrong {
     from {background-color: red;}
-    to {background-color: #f2f2f2;}
+    to {background-color: var(--background-color);}
 }
 
 .right{
     animation: right 2s;
+    background-color: var(--background-color);
 }
 
 @keyframes right {
     from {background-color: green;}
-    to {background-color: #f2f2f2;}
+    to {background-color: var(--background-color);}
 }
 
 .circle{
@@ -96,13 +97,13 @@ p{
 .commit-question-changes{
     height: 40px;
     display: block;
-    background-color: var(--blue-color);
+    background-color: var(--quiz-a-color);
     border-radius: 20px;
     padding: 6px;
 }
 
 .commit-question-changes:hover{
-    background-color: var(--purple-color);
+    background-color: var(--quiz-a-hover-color);
 }
 
 .svg-iframe{

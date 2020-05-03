@@ -14,6 +14,35 @@
 
 </head>
 <body>
+{% if theme == 'dark' %}
+    <script>
+        html = document.querySelector('html');
+        a = [['--background-color', '#002137'],
+            ['--text-color', '#999999'],
+
+            ['--quiz-a-text-color', '#999999'],
+            ['--quiz-a-text-hover-color', '#888888'],
+            ['--quiz-a-color', '#ffa500'],
+            ['--quiz-a-hover-color', '#ffba42']];
+        for (let i of a) {
+            html.style.setProperty(i[0], i[1]);
+        }
+    </script>
+{% else %}
+    <script>
+        html = document.querySelector('html');
+        a = [['--background-color', 'white'],
+            ['--text-color', '#222222'],
+
+            ['--quiz-a-text-color', '#999999'],
+            ['--quiz-a-text-hover-color', '#888888'],
+            ['--quiz-a-color', '#535efd'],
+            ['--quiz-a-hover-color', '#7B68EE']];
+        for (let i of a) {
+            html.style.setProperty(i[0], i[1]);
+        }
+    </script>
+{% endif %}
 <nav class="navbar navbar-toggleable-md navbar-inverse active" id="navbar-main"
      style="background: rgb(32, 33, 38);">
     <div class="container">

@@ -3,10 +3,6 @@
 <head>
     <meta charset="utf-8">
     <title>{{title}}</title>
-    <link rel="stylesheet" type="text/css"
-          href="https://protonvpn.com/assets/css/bootstrap.css?rel=1585324548038">
-    <link rel="stylesheet" type="text/css"
-          href="https://protonvpn.com/assets/css/main.css?rel=1585324548042">
     <link rel="stylesheet" href={{ url_for(
     'static', filename='css/base_style.css') }}/>
     <link rel="stylesheet" href={{ css }}/>
@@ -15,109 +11,77 @@
 </head>
 <body>
 <script>
-    $(document).ready(function(){
-        $('#checkout-button').click(function(){
-            circle = $('#circle');
-            if (circle.attr('class') == 'circle-left'){
-                circle.attr('class', 'circle-right');
-                circle.attr('src', 'https://img.icons8.com/ios-filled/20/000000/crescent-moon.png')
-            }
-            else{
-                circle.attr('class','circle-left');
-                circle.attr('src', 'https://img.icons8.com/android/20/000000/sun.png');
-            }
-        });
+$(document).ready(function(){
+    $('#checkout-button').click(function(){
+        circle = $('#circle');
+        if (circle.attr('class') == 'circle-left'){
+            circle.attr('class', 'circle-right');
+            circle.attr('src', 'https://img.icons8.com/ios-filled/20/000000/crescent-moon.png')
+        }
+        else{
+            circle.attr('class','circle-left');
+            circle.attr('src', 'https://img.icons8.com/android/20/000000/sun.png');
+        }
     });
+});
 </script>
 {% if theme == 'dark' %}
-    <script>
-        html = document.querySelector('html');
-        a = [['--background-color', '#002137'],
-            ['--text-color', '#999999'],
+<script>
+    html = document.querySelector('html');
+    a = [['--background-color', '#002137'],
+        ['--text-color', '#999999'],
 
-            ['--quiz-a-text-color', '#999999'],
-            ['--quiz-a-text-hover-color', '#888888'],
-            ['--quiz-a-color', '#ffa500'],
-            ['--quiz-a-hover-color', '#ffba42']];
-        for (let i of a) {
-            html.style.setProperty(i[0], i[1]);
-        }
-    </script>
+        ['--quiz-a-text-color', '#999999'],
+        ['--quiz-a-text-hover-color', '#888888'],
+        ['--quiz-a-color', '#ffa500'],
+        ['--quiz-a-hover-color', '#ffba42'],
+        ['--nav-color', '#242424'],
+        ['--blog-content-unit-color', '#222222']];
+    for (let i of a) {
+        html.style.setProperty(i[0], i[1]);
+    }
+</script>
 {% else %}
-    <script>
-        html = document.querySelector('html');
-        a = [['--background-color', 'white'],
-            ['--text-color', '#222222'],
+<script>
+    html = document.querySelector('html');
+    a = [['--background-color', 'white'],
+        ['--text-color', '#222222'],
 
-            ['--quiz-a-text-color', '#999999'],
-            ['--quiz-a-text-hover-color', '#888888'],
-            ['--quiz-a-color', '#535efd'],
-            ['--quiz-a-hover-color', '#7B68EE']];
-        for (let i of a) {
-            html.style.setProperty(i[0], i[1]);
-        }
-    </script>
+        ['--quiz-a-text-color', '#999999'],
+        ['--quiz-a-text-hover-color', '#888888'],
+        ['--quiz-a-color', '#535efd'],
+        ['--quiz-a-hover-color', '#7B68EE'],
+        ['--nav-color', '#72848f'],
+        ['--content-unit-color', '#999999']];
+    for (let i of a) {
+        html.style.setProperty(i[0], i[1]);
+    }
+</script>
 {% endif %}
-<nav class="navbar navbar-toggleable-md navbar-inverse active" id="navbar-main"
-     style="background: rgb(32, 33, 38);">
-    <div class="container">
-        <a class="navbar-brand active" href="/">
-            <div class="Page-title">
-                COVID-19
-            </div>
-            <em></em><i></i>
-        </a>
-        <div class="navbar-dark d-xl-none ml-auto">
-            <button class="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#navbar-mobile" aria-controls="navbar-mobile" aria-expanded="false"
-                    aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-        <div class="d-none d-xl-flex ml-auto" id="navbarSupportedContent">
-            <ul class="navbar-nav flex-row ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/"
-                                        style="width: 180px;">Главная страница</a></li>
-                <li class="nav-item"><a class="nav-link" href="/blog"
-                                        style="width: 70px;">Блог</a></li>
-                <li class="nav-item"><a class="nav-link" href="/quiz/0/start"
-                                        style="width: 110px;">Викторина</a></li>
-                <li class="nav-item"><a class="nav-link" href="/regions"
-                                        style="width: 100px;">Регионы</a></li>
-                {% if current_user.is_authenticated %}
-                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="/profile"
-                                                       style="width: 150px;">Профиль</a>
-                </li>
-                <li class="nav-item" id="nav-signup"><a
-                        class="nav-link btn btn-success text-uppercase"
-                        href="/logout"
-                        style="width: 140px;">Выйти</a></li>
-                {% else %}
-                <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="/login"
-                                                       style="width: 80px;">Войти</a></li>
-                <li class="nav-item" id="nav-signup"><a
-                        class="nav-link btn btn-success text-uppercase"
-                        href="/join"
-                        style="width: 140px;">Регистрация</a></li>
-                {% endif %}
-                <a href="/change_theme">
-                    {% if theme == 'white' %}
-                        <div id="checkout-button">
-                            <img id="circle" class="circle-left" src="https://img.icons8.com/android/20/000000/sun.png"/>
-                        </div>
-                    {% else %}
-                        <div id="checkout-button">
-                            <img id="circle" class="circle-right" src="https://img.icons8.com/ios-filled/20/000000/crescent-moon.png"/>
-                        </div>
-                    {% endif %}
-                </a>
-            </ul>
-        </div>
+<nav><div id="tittle" class="Page-title">
+    <a>COVID-19</a>
+</div><div id="nav-panel">
+    <a href="/">Главная</a>
+    <a href="/regions">Регионы</a>
+    <a href="/profile">Профиль</a>
+    <a href="/blog">Блог</a>
+    <a href="/quiz/0/start">Викторина</a>
+</div><div id="login-register">
+    <a id="login" href="/login">вход</a>
+    <a id="register" href="/join">регистрация</a>
+</div><div id="change_theme">
+<a href="/change_theme">
+    <div id="checkout-button">
+    {% if theme == 'white' %}
+        <img id="circle" class="circle-left" src="https://img.icons8.com/android/20/000000/sun.png"/>
+    {% else %}
+        <img id="circle" class="circle-right" src="https://img.icons8.com/ios-filled/20/000000/crescent-moon.png"/>
+    {% endif %}
     </div>
-</nav>
-
+</a>
+</div></nav>
+<div id="middle">
 {% block content %}{% endblock %}
-
+</div>
 </body>
 </html>

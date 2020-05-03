@@ -1,3 +1,5 @@
+
+
 table {
   font-family: "Сomic Sans MS" Cursive;
   border-collapse: collapse;
@@ -24,10 +26,13 @@ tr:nth-child(even) {
 
 A {
     text-decoration: none; /* Добавляем подчеркивание при наведении курсора на ссылку */
-    color: white; /* Ссылка красного цвета */
    }
 
 A:hover {
     text-decoration: underline; /* Добавляем подчеркивание при наведении курсора на ссылку */
     color: red; /* Ссылка красного цвета */
    }
+
+td{
+    color: var(--text-color);
+}

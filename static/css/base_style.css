@@ -76,7 +76,6 @@ iframe {
 
 #circle{
   padding: 5px;
-  transition: 0.2s;
   border-radius: 50%;
   position: relative;
 }

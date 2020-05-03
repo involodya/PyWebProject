@@ -528,7 +528,7 @@ def change_theme():
         session['theme'] = 'dark'
     else:
         session['theme'] = 'white'
-    return redirect('/')
+    return '<script>document.location.href = document.referrer</script>'
 
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])

@@ -517,17 +517,22 @@ def dalete(question_id):
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
-    global quiz_results
+    global quiz_results, questions_id
 
-    questions = get_quiz_questions()
-    questions_id = [i['id'] for i in questions]
+    if status != 'start':
+        if 'questions' not in session.keys():
+            return redirect('/quiz/0/start')
+        if not session['questions']:
+            return redirect('/quiz/0/start')
 
     if not question_number.isdigit():
         return redirect('/')
     question_number = int(question_number)
 
     if status == 'start':
-        session['answer_list'] = [-1] * len(questions)
+        session['questions'] = get_quiz_questions()
+        questions_id = [i['id'] for i in session['questions']]
+        session['answer_list'] = [-1] * len(session['questions'])
         if current_user.is_authenticated:
             if current_user.email not in quiz_results.keys():
                 quiz_results[current_user.email] = dict()
@@ -539,13 +544,13 @@ def quiz(question_number, status):
                                answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
                                    'answer_list'],
                                finish_flag=True)
-    elif question_number >= len(questions):
+    elif question_number >= len(session['questions']):
         return render_template('quiz_end.html', finish_flag=True,
                                answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
                                    'answer_list'], )
     elif status == 'question':
-        question = questions[question_number]['question']
-        answers = [questions[question_number]['right'], *questions[question_number]['false']]
+        question = session['questions'][question_number]['question']
+        answers = [session['questions'][question_number]['right'], *session['questions'][question_number]['false']]
         shuffle(answers)
         return render_template('quiz_question.html', question=question,
                                answers=[str(i) for i in answers],
@@ -556,12 +561,12 @@ def quiz(question_number, status):
     else:
         answer = status
 
-        right = str(answer) == str(questions[question_number]['right'])
+        right = str(answer) == str(session['questions'][question_number]['right'])
         if current_user.is_authenticated:
             if right:
-                quiz_results[current_user.email][questions[question_number]['id']] = 1
+                quiz_results[current_user.email][session['questions'][question_number]['id']] = 1
             else:
-                quiz_results[current_user.email][questions[question_number]['id']] = 0
+                quiz_results[current_user.email][session['questions'][question_number]['id']] = 0
         else:
             if right:
                 session['answer_list'][question_number] = 1
@@ -570,10 +575,10 @@ def quiz(question_number, status):
 
         return render_template('quiz_explanation.html', right=right,
                                next_page=f'/quiz/{question_number + 1}/question',
-                               explanation=questions[question_number][
-                                   'explanation'] if 'explanation' in questions[
+                               explanation=session['questions'][question_number][
+                                   'explanation'] if 'explanation' in session['questions'][
                                    question_number].keys() else '',
-                               right_answer=questions[question_number]['right'],
+                               right_answer=session['questions'][question_number]['right'],
                                answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
                                    'answer_list'], finish_flag=True)
 

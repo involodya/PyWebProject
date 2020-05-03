@@ -9,16 +9,16 @@
         <div id="middle">
             <div class="circle_menu">
                 {% for ans in answer_list %}
-                {% if ans == 1 %}
-                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
-                   style="background-color: #65e665"></a>
-                {% elif ans == 0 %}
-                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
-                   style="background-color: #ff3333"></a>
-                {% else %}
-                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
-                   style="background-color: #bbbbbb"></a>
-                {% endif %}
+                    {% if ans == 1 %}
+                        <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                           style="background-color: #65e665"></a>
+                    {% elif ans == 0 %}
+                        <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                           style="background-color: #ff3333"></a>
+                    {% else %}
+                        <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                           style="background-color: #bbbbbb"></a>
+                    {% endif %}
                 {% endfor %}
                 {% if finish_flag %}
                 <a href="/quiz/999999/question" style="border: none"><img class="circle"

@@ -21,7 +21,7 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.false_answers(type="textarea", placeholder='Неправильные вопросы (по одному в строке)', style="width: 100%") }}
+            {{ form.false_answers(type="textarea", placeholder='Неправильные ответы (по одному в строке)', style="width: 100%") }}
             {% for error in form.false_answers.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}

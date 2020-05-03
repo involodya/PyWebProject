@@ -18,7 +18,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+quiz_results = dict()
+debug = 1
 
 def main():
     db_session.global_init("db/database.sqlite")
@@ -516,20 +517,32 @@ def dalete(question_id):
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
+    global quiz_results
+
     questions = get_quiz_questions()
-    print(questions)
+    questions_id = [i['id'] for i in questions]
+
     if not question_number.isdigit():
         return redirect('/')
     question_number = int(question_number)
 
     if status == 'start':
         session['answer_list'] = [-1] * len(questions)
+        if current_user.is_authenticated:
+            if current_user.email not in quiz_results.keys():
+                quiz_results[current_user.email] = dict()
+            for i in questions_id:
+                if i not in quiz_results[current_user.email].keys():
+                    quiz_results[current_user.email][i] = -1
+
         return render_template('start_quiz.html', next_page='/quiz/0/question',
-                               answer_list=session['answer_list'],
+                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
+                                   'answer_list'],
                                finish_flag=True)
     elif question_number >= len(questions):
         return render_template('quiz_end.html', finish_flag=True,
-                               answer_list=session['answer_list'])
+                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
+                                   'answer_list'], )
     elif status == 'question':
         question = questions[question_number]['question']
         answers = [questions[question_number]['right'], *questions[question_number]['false']]
@@ -538,15 +551,22 @@ def quiz(question_number, status):
                                answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}',
                                question_number=question_number,
-                               answer_list=session['answer_list'], finish_flag=True)
+                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
+                                   'answer_list'], finish_flag=True)
     else:
         answer = status
 
         right = str(answer) == str(questions[question_number]['right'])
-        if right:
-            session['answer_list'][question_number] = 1
+        if current_user.is_authenticated:
+            if right:
+                quiz_results[current_user.email][questions[question_number]['id']] = 1
+            else:
+                quiz_results[current_user.email][questions[question_number]['id']] = 0
         else:
-            session['answer_list'][question_number] = 0
+            if right:
+                session['answer_list'][question_number] = 1
+            else:
+                session['answer_list'][question_number] = 0
 
         return render_template('quiz_explanation.html', right=right,
                                next_page=f'/quiz/{question_number + 1}/question',
@@ -554,7 +574,8 @@ def quiz(question_number, status):
                                    'explanation'] if 'explanation' in questions[
                                    question_number].keys() else '',
                                right_answer=questions[question_number]['right'],
-                               answer_list=session['answer_list'], finish_flag=True)
+                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
+                                   'answer_list'], finish_flag=True)
 
 
 @login_manager.user_loader

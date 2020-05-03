@@ -1,14 +1,17 @@
-import sqlite3
 import datetime
 import os
+import sqlite3
+from random import shuffle
+
 from PIL import Image
 from data.posts import Post
 from data.regions import Region
 from data.users import User
 from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm
-from random import shuffle
+from flask_ngrok import run_with_ngrok
+from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileForm
+
 from data import db_session
 
 app = Flask(__name__)
@@ -19,7 +22,60 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/database.sqlite")
-    app.run(port=8080, host='127.0.0.1', debug=True)
+    run_with_ngrok(app)
+    app.run()
+    # app.run(port=8080, host='127.0.0.1', debug=True)
+
+
+def add_avatar(f, user):
+    # добавим аватар, если пользователь загрузил его
+
+    if bool(f):
+        type = f.filename.split('.')[-1]
+        filename = f'user_avatar_{user.id}.{type}'
+        f.save(os.path.join(
+            'static', 'avatars', filename
+        ))
+
+        #  сделаем аватар квадратным
+
+        im = Image.open(os.path.join(
+            'static', 'avatars', filename
+        ))
+        pixels = im.load()  # список с пикселями
+        x, y = im.size
+        if x > y:
+            size = y
+        else:
+            size = x
+        avatar = Image.new('RGB', (size, size), (0, 0, 0))
+        av_pixels = avatar.load()
+
+        # фото обрезается по центру
+
+        dx = (x - size) // 2
+        dy = (y - size) // 2
+
+        for i in range(size):
+            for j in range(size):
+                r, g, b = pixels[i + dx, j + dy]
+                av_pixels[i, j] = r, g, b
+        avatar.save(os.path.join(
+            'static', 'avatars', filename
+        ))
+
+        session = db_session.create_session()
+        user = session.query(User).filter(User.id == user.id).first()
+        user.avatar = os.path.join(
+            'static', 'avatars', filename
+        )
+        session.commit()
+
+    else:
+        session = db_session.create_session()
+        user = session.query(User).filter(User.id == user.id).first()
+        user.avatar = "/../static/avatars/user_avatar_default.jpg"
+        session.commit()
 
 
 @app.route('/')
@@ -28,6 +84,38 @@ def main_page():
 
     return render_template('home.html', title='Коронавирус',
                            css=url_for('static', filename='css/home_style.css'))
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile_page():
+    """ обработчик страницы профиля """
+
+    form = ProfileForm()
+    session = db_session.create_session()
+    profile = session.query(User).filter(User.id == current_user.id).first()
+
+    if request.method == "GET":
+        form.email.data = profile.email
+        form.surname.data = profile.surname
+        form.name.data = profile.name
+        form.age.data = profile.age
+        form.about.data = profile.about
+        form.education.data = profile.education
+        form.speciality.data = profile.speciality
+
+    if form.validate_on_submit():
+        profile.surname = form.surname.data
+        profile.name = form.name.data
+        profile.age = form.age.data
+        profile.about = form.about.data
+        profile.education = form.education.data
+        profile.speciality = form.speciality.data
+        session.commit()
+
+        add_avatar(form.avatar.data, current_user)
+
+    return render_template('profile.html', title='Профиль', form=form,
+                           css=url_for('static', filename='css/profile_style.css'))
 
 
 @app.route("/blog")
@@ -68,7 +156,12 @@ def add_post():
             f.save(path)
             post.attachment = path
             session.commit()
+
+        post_id = session.query(Post).order_by(Post.id.desc()).first().id
+        os.system(f'python send_news_emails.pyw --id {post_id}')
+
         return redirect('/blog')
+
     return render_template('post.html', title='Новый пост',
                            form=form, css=url_for('static', filename='css/post_style.css'))
 
@@ -102,7 +195,19 @@ def edit_post(id):
             post.title = form.title.data
             post.content = form.content.data
             session.commit()
-            return redirect('/blog')
+            if bool(form.attachment.data):
+                session = db_session.create_session()
+                post = session.query(Post).order_by(Post.id.desc()).first()
+                f = form.attachment.data
+                type = f.filename.split('.')[-1]
+                filename = f'post_attachment_{post.id}.{type}'
+                path = os.path.join(
+                    'static', 'attachments', filename
+                )
+                f.save(path)
+                post.attachment = path
+                session.commit()
+                return redirect('/blog')
         else:
             abort(404)
     return render_template('post.html', title='Редактирование поста',
@@ -220,7 +325,6 @@ def join():
 
         body = render_template('started_email.html', name=str(name), login=str(acc_login),
                                password=str(acc_password))
-        print(body)
         msg.attach(MIMEText(body, 'html'))
 
         server = smtplib.SMTP(SMTPserver, 587)  # отправляем
@@ -257,55 +361,8 @@ def join():
         session.add(user)
         session.commit()
 
-        # добавим аватар, если пользователь загрузил его
+        add_avatar(form.avatar.data, user)
 
-        if bool(form.avatar.data):
-            f = form.avatar.data
-            type = f.filename.split('.')[-1]
-            filename = f'user_avatar_{user.id}.{type}'
-            f.save(os.path.join(
-                'static', 'avatars', filename
-            ))
-
-            #  сделаем аватар квадратным
-
-            im = Image.open(os.path.join(
-                'static', 'avatars', filename
-            ))
-            pixels = im.load()  # список с пикселями
-            x, y = im.size
-            if x > y:
-                size = y
-            else:
-                size = x
-            avatar = Image.new('RGB', (size, size), (0, 0, 0))
-            av_pixels = avatar.load()
-
-            # фото обрезается по центру
-
-            dx = (x - size) // 2
-            dy = (y - size) // 2
-
-            for i in range(size):
-                for j in range(size):
-                    r, g, b = pixels[i + dx, j + dy]
-                    av_pixels[i, j] = r, g, b
-            avatar.save(os.path.join(
-                'static', 'avatars', filename
-            ))
-
-            session = db_session.create_session()
-            user = session.query(User).filter(User.id == user.id).first()
-            user.avatar = os.path.join(
-                'static', 'avatars', filename
-            )
-            session.commit()
-
-        else:
-            session = db_session.create_session()
-            user = session.query(User).filter(User.id == user.id).first()
-            user.avatar = "/../static/avatars/user_avatar_default.jpg"
-            session.commit()
         send_started_email(form.name.data, form.email.data, form.password.data, form.email.data)
 
         return redirect('/login')
@@ -341,7 +398,7 @@ def get_quiz_questions():
     questions = cur.execute("""select * from questions""").fetchall()
     false_answers = cur.execute(
         """select question_id, false_answer from false_answers""").fetchall()
-    print('flase answers = ', false_answers)
+    # print('flase answers = ', false_answers)
     ret = []
 
     for i in questions:

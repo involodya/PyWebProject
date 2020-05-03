@@ -5,7 +5,7 @@
         <h1>Правильно!</h1>
         <script>
             $(document).ready(function(){
-                $("body").addClass("right");
+                $(".Content-unit").addClass("right");
             });
         </script>
     {% else %}
@@ -14,7 +14,7 @@
         <p>{{ right_answer }}</p>
         <script>
             $(document).ready(function(){
-                $("body").addClass("wrong");
+                $(".Content-unit").addClass("wrong");
             });
         </script>
     {% endif %}

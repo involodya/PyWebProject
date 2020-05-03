@@ -1,46 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main role="main" class="container">
-<h1 align="center">Записи в блоге</h1><br/>
-{% if current_user.is_authenticated and current_user.verified %}
-    <a href="/post" class="btn btn-primary">Новый пост</a><br/>
-{% endif %}
-    <br/>
-{% for item in posts %}
-    <table border="1" width="100%">
-        <tr>
-            <td width="200px">{{item.user.name}} {{item.user.surname}}</td>
-            <td width="800px">{{item.string_created_date}}</td>
-        </tr>
-        <tr>
-            <td width="200px" height="230px">
-                <img src="{{item.user.avatar}}" width="200px" height="200px">
-            </td>
-            <td width="800px">
-                <h2>{{item.title}}</h2>
-                <p>{{item.content}}</p>
-                {% if item.attachment %}
-                    <div>
-                        <img src="{{item.attachment}}" width="80%" height="100%">
-                    </div>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>{{item.user.about}}</td>
-            <td>
-                <div style="float:left;">
-                    <a href="/post_like/{{item.id}}" class="btn btn-primary" style="background-color: green;">👍 {{item.likes}}</a>
-                    <a href="/post_dislike/{{item.id}}" class="btn btn-primary" style="background-color: red;">👎 {{item.dislikes}}</a>
-                    {% if current_user.is_authenticated and (current_user == item.user or current_user.role == 'admin')%}
-                    <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>
-                    <a href="/post_delete/{{item.id}}" class="btn btn-danger">Удалить</a>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-    </table><br/>
-{% endfor %}
-</main>
+<div class="Main-content">
+    <main role="main" class="container">
+        <section class="Content-unit">
+            <h1 align="center">Записи в блоге</h1><br/>
+            {% if current_user.is_authenticated and current_user.verified %}
+            <a href="/post" class="btn btn-primary">Новый пост</a><br/>
+            {% endif %}
+            <br/>
+        </section>
+        {% for item in posts %}
+        <section class="Content-unit">
+            <table border="1" width="100%">
+                <tr>
+                    <td width="200px">{{item.user.name}} {{item.user.surname}}</td>
+                    <td width="800px">{{item.string_created_date}}</td>
+                </tr>
+                <tr>
+                    <td width="200px" height="230px">
+                        <img src="{{item.user.avatar}}" width="200px" height="200px">
+                    </td>
+                    <td width="800px">
+                        <h2>{{item.title}}</h2>
+                        <p>{{item.content}}</p>
+                        {% if item.attachment %}
+                        <div>
+                            <img src="{{item.attachment}}" width="80%" height="100%">
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{item.user.about}}</td>
+                    <td>
+                        <div style="float:left;">
+                            <a href="/post_like/{{item.id}}" class="btn btn-primary"
+                               style="background-color: green;">👍 {{item.likes}}</a>
+                            <a href="/post_dislike/{{item.id}}" class="btn btn-primary"
+                               style="background-color: red;">👎 {{item.dislikes}}</a>
+                            {% if current_user.is_authenticated and (current_user == item.user or
+                            current_user.role == 'admin')%}
+                            <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>
+                            <a href="/post_delete/{{item.id}}" class="btn btn-danger">Удалить</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+        </section>
+        {% endfor %}
+    </main>
+</div>
 {% endblock %}

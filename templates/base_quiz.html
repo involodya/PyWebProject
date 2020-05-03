@@ -1,24 +1,32 @@
 {% extends "base.html" %}
 {% block head %}
-    <link rel="stylesheet" href={{ url_for('static', filename='css/quiz.css') }}/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<link rel="stylesheet" href={{ url_for('static', filename='css/quiz.css') }}/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 {% endblock %}
 {% block content %}
-    <div id="middle">
-        <div class="circle_menu">
-            {% for ans in answer_list %}
+<div class="Main-content">
+    <section class="Content-unit">
+        <div id="middle">
+            <div class="circle_menu">
+                {% for ans in answer_list %}
                 {% if ans == 1 %}
-                    <a class="circle" href="/quiz/{{ loop.index - 1 }}/question" style="background-color: #65e665"></a>
+                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                   style="background-color: #65e665"></a>
                 {% elif ans == 0 %}
-                    <a class="circle" href="/quiz/{{ loop.index - 1 }}/question" style="background-color: #ff3333"></a>
+                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                   style="background-color: #ff3333"></a>
                 {% else %}
-                    <a class="circle" href="/quiz/{{ loop.index - 1 }}/question" style="background-color: #bbbbbb"></a>
+                <a class="circle" href="/quiz/{{ loop.index - 1 }}/question"
+                   style="background-color: #bbbbbb"></a>
                 {% endif %}
-            {% endfor %}
-            {%  if finish_flag %}
-                <a href="/quiz/999999/question" style="border: none"><img class="circle" src="https://img.icons8.com/windows/32/000000/finish-flag.png"/></a>
-            {% endif %}
+                {% endfor %}
+                {% if finish_flag %}
+                <a href="/quiz/999999/question" style="border: none"><img class="circle"
+                                                                          src="https://img.icons8.com/windows/32/000000/finish-flag.png"/></a>
+                {% endif %}
+            </div>
+            {% block content2 %}{% endblock %}
         </div>
-        {% block content2 %}{% endblock %}
-    </div>
+    </section>
+</div>
 {% endblock %}

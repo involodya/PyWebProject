@@ -7,6 +7,8 @@
           href="https://protonvpn.com/assets/css/bootstrap.css?rel=1585324548038">
     <link rel="stylesheet" type="text/css"
           href="https://protonvpn.com/assets/css/main.css?rel=1585324548042">
+    <link rel="stylesheet" href={{ url_for(
+    'static', filename='css/base_style.css') }}/>
     <link rel="stylesheet" href={{ css }}/>
     {% block head %}{% endblock %}
 
@@ -29,29 +31,27 @@
         </div>
         <div class="d-none d-xl-flex ml-auto" id="navbarSupportedContent">
             <ul class="navbar-nav flex-row ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/regions" style="width: 99.175px;">Регионы</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/"
+                                        style="width: 180px;">Главная страница</a></li>
                 <li class="nav-item"><a class="nav-link" href="/blog"
-                                        style="width: 70.025px;">Блог</a></li>
+                                        style="width: 70px;">Блог</a></li>
                 <li class="nav-item"><a class="nav-link" href="/quiz/0/start"
-                                        style="width: 70.025px;">Викторина</a></li>
-                <li class="nav-item"><a class="nav-link" href="/"
-                                        style="width: 70.025px;">.</a></li>
-                <li class="nav-item"><a class="nav-link" href="/"
-                                        style="width: 70.025px;">.</a></li>
-                <li class="nav-item"><a class="nav-link" href="/"
-                                        style="width: 70.025px;">.</a></li>
-                <li class="nav-item"><a class="nav-link" href="/"
-                                        style="width: 70.025px;">.</a></li>
-                <li class="divider" aria-hidden="true"></li>
+                                        style="width: 110px;">Викторина</a></li>
+                <li class="nav-item"><a class="nav-link" href="/regions"
+                                        style="width: 100px;">Регионы</a></li>
                 {% if current_user.is_authenticated %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
-                                                       href="/logout"
-                                                       style="width: 84.35px;">{{current_user.name}}</a></li>
+                                                       href="/profile"
+                                                       style="width: 150px;">Профиль</a>
+                </li>
+                <li class="nav-item" id="nav-signup"><a
+                        class="nav-link btn btn-success text-uppercase"
+                        href="/logout"
+                        style="width: 140px;">Выйти</a></li>
                 {% else %}
                 <li class="nav-item" id="nav-login"><a class="nav-link text-success text-uppercase"
                                                        href="/login"
-                                                       style="width: 84.35px;">Войти</a></li>
+                                                       style="width: 80px;">Войти</a></li>
                 <li class="nav-item" id="nav-signup"><a
                         class="nav-link btn btn-success text-uppercase"
                         href="/join"
@@ -62,7 +62,7 @@
     </div>
 </nav>
 
-    {% block content %}{% endblock %}
+{% block content %}{% endblock %}
 
 </body>
 </html>

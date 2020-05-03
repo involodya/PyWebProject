@@ -1,5 +1,7 @@
 import json
+
 from data.regions import Region
+
 from data import db_session
 
 #  Обновляем статистику в БД (берем из yandex_statisctics.json)

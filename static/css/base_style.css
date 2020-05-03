@@ -16,6 +16,9 @@
 }
 }
 
+body {
+    background-color: #202126;
+}
 
 selection {
   display: block;

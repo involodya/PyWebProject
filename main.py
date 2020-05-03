@@ -22,9 +22,9 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/database.sqlite")
-    run_with_ngrok(app)
-    app.run()
-    # app.run(port=8080, host='127.0.0.1', debug=True)
+    # run_with_ngrok(app)
+    # app.run()
+    app.run(port=8080, host='127.0.0.1', debug=True)
 
 
 def add_avatar(f, user):

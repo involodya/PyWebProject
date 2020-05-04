@@ -8,6 +8,7 @@
     <link rel="stylesheet" href={{ css }}/>
     {% block head %}{% endblock %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
 </head>
 <body>
 <script>
@@ -36,7 +37,8 @@ $(document).ready(function(){
         ['--quiz-a-color', '#ffa500'],
         ['--quiz-a-hover-color', '#ffba42'],
         ['--nav-color', '#242424'],
-        ['--blog-content-unit-color', '#222222']];
+        ['--blog-content-unit-color', '#222222'],
+        ['--second-background-color', '#888888']];
     for (let i of a) {
         html.style.setProperty(i[0], i[1]);
     }
@@ -52,7 +54,8 @@ $(document).ready(function(){
         ['--quiz-a-color', '#535efd'],
         ['--quiz-a-hover-color', '#7B68EE'],
         ['--nav-color', '#72848f'],
-        ['--content-unit-color', '#999999']];
+        ['--content-unit-color', '#999999'],
+        ['--second-background-color', 'white']];
     for (let i of a) {
         html.style.setProperty(i[0], i[1]);
     }

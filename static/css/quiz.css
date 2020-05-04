@@ -1,9 +1,3 @@
-*{
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-}
-
 #middle{
     width: 50%;
     left: 25%;
@@ -37,26 +31,6 @@ p{
     text-decoration: none;
     background-color: var(--quiz-a-hover-color);
     color: #f2f2f2;
-}
-
-.wrong{
-    animation: wrong 2s;
-    background-color: var(--background-color);
-}
-
-@keyframes wrong {
-    from {background-color: red;}
-    to {background-color: var(--background-color);}
-}
-
-.right{
-    animation: right 2s;
-    background-color: var(--background-color);
-}
-
-@keyframes right {
-    from {background-color: green;}
-    to {background-color: var(--background-color);}
 }
 
 .circle{

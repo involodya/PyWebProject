@@ -27,39 +27,9 @@ $(document).ready(function(){
 });
 </script>
 {% if theme == 'dark' %}
-<script>
-    html = document.querySelector('html');
-    a = [['--background-color', '#002137'],
-        ['--text-color', '#999999'],
-
-        ['--quiz-a-text-color', '#999999'],
-        ['--quiz-a-text-hover-color', '#888888'],
-        ['--quiz-a-color', '#ffa500'],
-        ['--quiz-a-hover-color', '#ffba42'],
-        ['--nav-color', '#242424'],
-        ['--blog-content-unit-color', '#222222'],
-        ['--second-background-color', '#888888']];
-    for (let i of a) {
-        html.style.setProperty(i[0], i[1]);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/set_dark_theme.js') }}"></script>
 {% else %}
-<script>
-    html = document.querySelector('html');
-    a = [['--background-color', 'white'],
-        ['--text-color', '#222222'],
-
-        ['--quiz-a-text-color', '#999999'],
-        ['--quiz-a-text-hover-color', '#888888'],
-        ['--quiz-a-color', '#535efd'],
-        ['--quiz-a-hover-color', '#7B68EE'],
-        ['--nav-color', '#72848f'],
-        ['--content-unit-color', '#999999'],
-        ['--second-background-color', 'white']];
-    for (let i of a) {
-        html.style.setProperty(i[0], i[1]);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/set_white_theme.js') }}"></script>
 {% endif %}
 <nav><div id="tittle" class="Page-title">
     <a>COVID-19</a>

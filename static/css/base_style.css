@@ -1,3 +1,8 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
 @keyframes Header-coronavirus {
 0% {
     color: #ea316d;
@@ -16,15 +21,8 @@
 }
 }
 
-*{
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
-}
-
-a{
-    text-decoration: none;
+body {
+    background-color: #202126;
 }
 
 selection {
@@ -48,6 +46,7 @@ iframe {
     flex-flow: column nowrap;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    background-color: var(--background-color);
 }
 
 .Content-unit {
@@ -56,7 +55,12 @@ iframe {
     margin-bottom: 15px;
     padding: 2.25rem;
     border-radius: 10px;
-    background: var(--content-unit-color);
+    background-color: var(--second-background-color);
+
+}
+
+h1{
+    color: red;
 }
 
 .Page-title {
@@ -161,6 +165,7 @@ nav{
     position: relative;
     margin-bottom: 38px;
     padding: 10px;
+    text-decoration: none;
 }
 
 #login{
@@ -197,4 +202,35 @@ nav{
     background-color: var(--background-color);
 }
 
+input{
+    width: 100%;
+    font-size: 20px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 2px;
+    margin: 10px;
+    background-color: var(--second-background-color);
+    color: var(--second-text-color);
+}
+
+textarea{
+    width: 100%;
+    font-size: 20px;
+    border: 2px solid ver(--input-border-color);
+    border-radius: 2px;
+    margin: 10px;
+    background-color: var(--second-background-color);
+    color: var(--second-text-color);
+}
+
+p{
+    color: var(--text-color);
+}
+
+h1{
+    color: var(--text-color);
+}
+
+h2{
+    color: var(--text-color);
+}
 

@@ -1,5 +1,18 @@
 td {
     vertical-align: top;
+    color: var(--second-text-color);
+}
+
+p{
+    color: var(--second-text-color);
+}
+
+h2{
+    color: var(--second-text-color);
+}
+
+h1{
+    color: var(--second-text-color);
 }
 
 .Content-unit {

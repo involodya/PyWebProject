@@ -11,21 +11,7 @@
 
 </head>
 <body>
-<script>
-$(document).ready(function(){
-    $('#checkout-button').click(function(){
-        circle = $('#circle');
-        if (circle.attr('class') == 'circle-left'){
-            circle.attr('class', 'circle-right');
-            circle.attr('src', 'https://img.icons8.com/ios-filled/20/000000/crescent-moon.png')
-        }
-        else{
-            circle.attr('class','circle-left');
-            circle.attr('src', 'https://img.icons8.com/android/20/000000/sun.png');
-        }
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='js/choose_theme_button_animation.js') }}"></script>
 {% if theme == 'dark' %}
 <script src="{{ url_for('static', filename='js/set_dark_theme.js') }}"></script>
 {% else %}
@@ -36,12 +22,16 @@ $(document).ready(function(){
 </div><div id="nav-panel">
     <a href="/">Главная</a>
     <a href="/regions">Регионы</a>
-    <a href="/profile">Профиль</a>
     <a href="/blog">Блог</a>
     <a href="/quiz/0/start">Викторина</a>
 </div><div id="login-register">
+    {% if current_user.is_authenticated %}
+    <a id="login" href="/logout">Выйти</a>
+    <a id="register" href="/profile">Профиль</a>
+    {% else %}
     <a id="login" href="/login">вход</a>
     <a id="register" href="/join">регистрация</a>
+    {% endif %}
 </div><div id="change_theme">
 <a href="/change_theme">
     <div id="checkout-button">
@@ -53,8 +43,8 @@ $(document).ready(function(){
     </div>
 </a>
 </div></nav>
-<div id="middle">
+
 {% block content %}{% endblock %}
-</div>
+
 </body>
 </html>

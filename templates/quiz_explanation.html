@@ -3,10 +3,20 @@
 {% block content2 %}
     {% if right %}
         <h1>Правильно!</h1>
+        <script>
+            $(document).ready(function(){
+                $(".Content-unit").addClass("right");
+            });
+        </script>
     {% else %}
         <h1>Неправильно!</h1>
         <h2>Правильный ответ:</h2>
         <p>{{ right_answer }}</p>
+        <script>
+            $(document).ready(function(){
+                $(".Content-unit").addClass("wrong");
+            });
+        </script>
     {% endif %}
     {% if explanation %}
         <p>{{ explanation }}</p>

@@ -13,21 +13,21 @@ th {
 
 tr:nth-child(odd) {
   background: #6495ED;
-  color: var(--text-color);
+  color: white;
   font-size: 14pt;
 }
 tr:nth-child(even) {
   background: #7B68EE;
-  color: var(--text-color);
+  color: white;
   font-size: 14pt;
 }
 
-.red-a {
+A {
     text-decoration: none; /* Добавляем подчеркивание при наведении курсора на ссылку */
-    color: var(--text-color); /* Ссылка красного цвета */
+    color: white; /* Ссылка красного цвета */
    }
 
-.red-a:hover {
+A:hover {
     text-decoration: underline; /* Добавляем подчеркивание при наведении курсора на ссылку */
     color: red; /* Ссылка красного цвета */
    }

@@ -34,15 +34,15 @@
                 <tr>
                     <td>{{item.user.about}}</td>
                     <td>
-                        <div style="float:left;">
-                            <a href="/post_like/{{item.id}}" class="btn btn-primary"
+                        <div id="div-a" style="float:left; height: 40px;">
+                            <a href="/post_like/{{item.id}}" class="btn like_button"
                                style="background-color: green;">👍 {{item.likes}}</a>
-                            <a href="/post_dislike/{{item.id}}" class="btn btn-primary"
+                            <a href="/post_dislike/{{item.id}}" class="btn dislike_button"
                                style="background-color: red;">👎 {{item.dislikes}}</a>
                             {% if current_user.is_authenticated and (current_user == item.user or
                             current_user.role == 'admin')%}
-                            <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>
-                            <a href="/post_delete/{{item.id}}" class="btn btn-danger">Удалить</a>
+                            <a href="/post/{{item.id}}" class="btn change_button">Изменить</a>
+                            <a href="/post_delete/{{item.id}}" class="btn delete_button">Удалить</a>
                             {% endif %}
                         </div>
                     </td>

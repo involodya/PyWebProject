@@ -18,3 +18,34 @@ h1{
 .Content-unit {
      width: 90%;
 }
+
+.like_button{
+    background-color: green;
+    height: 20px;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.dislike_button{
+    background-color: green;
+    height: 20px;
+    border-radius: 20px;
+    padding: 10px;
+}
+.change_button{
+    background-color: grey;
+    height: 20px;
+    border-radius: 20px;
+    padding: 10px;
+}
+.delete_button{
+    background-color: red;
+    height: 20px;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+#div-a > a{
+    display: inline-block;
+    text-decoration: none;
+}

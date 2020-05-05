@@ -23,9 +23,9 @@ quiz_results = dict()
 
 def main():
     db_session.global_init("db/database.sqlite")
-    run_with_ngrok(app)
-    app.run()
-    # app.run(port=8080, host='127.0.0.1', debug=True)
+    #run_with_ngrok(app)
+    #app.run()
+    app.run(port=8080, host='127.0.0.1', debug=True)
 
 
 def add_avatar(f, user):
@@ -239,6 +239,7 @@ def post_delete(id):
 
 @app.route('/post_like/<int:id>', methods=['GET', 'POST'])
 def post_like(id):
+    global post
     """ обработчик лайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
@@ -257,11 +258,13 @@ def post_like(id):
             session[name_like] = 1
         else:
             abort(404)
-    return redirect('/blog')
+
+    return f'{post.likes} {post.dislikes} {id}'
 
 
 @app.route('/post_dislike/<int:id>', methods=['GET', 'POST'])
 def post_dislike(id):
+    global post
     """ обработчик дизлайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
@@ -280,7 +283,8 @@ def post_dislike(id):
             session[name_dislike] = 1
         else:
             abort(404)
-    return redirect('/blog')
+    print(post.likes)
+    return f'{post.likes} {post.dislikes} {id}'
 
 
 @app.route('/regions')

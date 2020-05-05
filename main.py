@@ -21,7 +21,7 @@ login_manager.init_app(app)
 quiz_results = dict()
 debug = 1
 
-
+#ff
 def get_theme():
     if 'theme' not in session.keys():
         return 'dark'

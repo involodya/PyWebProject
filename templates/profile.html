@@ -5,7 +5,11 @@
     <section class="Content-unit">
         <main role="main" class="container">
             <h1>Профиль</h1>
-            <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>
+            {% if current_user.verified %}
+                <p>Ваш аккаунт верифицирован</p>
+            {% else %}
+                <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>
+            {% endif %}
             <form action="" method="post" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 {{ form.csrf_token }}

@@ -19,20 +19,13 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 quiz_results = dict()
-debug = 1
-
-
-def get_theme():
-    if 'theme' not in session.keys():
-        return 'dark'
-    return session['theme']
 
 
 def main():
     db_session.global_init("db/database.sqlite")
-    # run_with_ngrok(app)
-    # app.run()
-    app.run(port=8080, host='127.0.0.1', debug=True)
+    run_with_ngrok(app)
+    app.run()
+    # app.run(port=8080, host='127.0.0.1', debug=True)
 
 
 def add_avatar(f, user):
@@ -91,7 +84,7 @@ def main_page():
     """ обработчик главной страницы """
 
     return render_template('home.html', title='Коронавирус',
-                           css=url_for('static', filename='css/home_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/home_style.css'))
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -123,7 +116,7 @@ def profile_page():
         add_avatar(form.avatar.data, current_user)
 
     return render_template('profile.html', title='Профиль', form=form,
-                           css=url_for('static', filename='css/profile_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/profile_style.css'))
 
 
 @app.route("/blog")
@@ -134,7 +127,7 @@ def index():
     posts = session.query(Post).all()
     posts = sorted(posts, key=lambda x: x.created_date, reverse=True)
     return render_template("blog.html", posts=posts, title='Блог',
-                           css=url_for('static', filename='css/blog_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/blog_style.css'))
 
 
 @app.route('/post', methods=['GET', 'POST'])
@@ -166,12 +159,13 @@ def add_post():
             session.commit()
 
         post_id = session.query(Post).order_by(Post.id.desc()).first().id
+        print(228, post_id)
         os.system(f'python send_news_emails.pyw --id {post_id}')
 
         return redirect('/blog')
 
     return render_template('post.html', title='Новый пост',
-                           form=form, css=url_for('static', filename='css/post_style.css'), theme=get_theme())
+                           form=form, css=url_for('static', filename='css/post_style.css'))
 
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
@@ -219,7 +213,7 @@ def edit_post(id):
         else:
             abort(404)
     return render_template('post.html', title='Редактирование поста',
-                           form=form, css=url_for('static', filename='css/post_style.css'), theme=get_theme())
+                           form=form, css=url_for('static', filename='css/post_style.css'))
 
 
 @app.route('/post_delete/<int:id>', methods=['GET', 'POST'])
@@ -296,7 +290,7 @@ def regions():
     session = db_session.create_session()
     regions = session.query(Region).all()
     return render_template('regions.html', title='Регионы', regions=regions,
-                           css=url_for('static', filename='css/regions_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/regions_style.css'))
 
 
 @app.route('/regions/<region_id>')
@@ -306,12 +300,14 @@ def region(region_id):
     session = db_session.create_session()
     region = session.query(Region).filter(Region.id == region_id).first()
     return render_template('region.html', title=region.name, region=region,
-                           css=url_for('static', filename='css/region_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/region_style.css'))
 
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
     """ обработчик регистрации пользователя """
+    if current_user.is_authenticated:
+        return redirect('/profile')
 
     def send_started_email(name, acc_login, acc_password, toAdr):
         import imaplib
@@ -332,7 +328,7 @@ def join():
         msg['Subject'] = 'Регистрация в системе COVID-19'
 
         body = render_template('started_email.html', name=str(name), login=str(acc_login),
-                               password=str(acc_password), theme=get_theme())
+                               password=str(acc_password))
         msg.attach(MIMEText(body, 'html'))
 
         server = smtplib.SMTP(SMTPserver, 587)  # отправляем
@@ -348,13 +344,13 @@ def join():
             return render_template('join.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают",
-                                   css=url_for('static', filename='css/join_style.css'), theme=get_theme())
+                                   css=url_for('static', filename='css/join_style.css'))
         session = db_session.create_session()
         if session.query(User).filter(User.email == form.email.data).first():
             return render_template('join.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть",
-                                   css=url_for('static', filename='css/join_style.css'), theme=get_theme())
+                                   css=url_for('static', filename='css/join_style.css'))
         user = User(
             surname=form.surname.data,
             name=form.name.data,
@@ -375,12 +371,14 @@ def join():
 
         return redirect('/login')
     return render_template('join.html', title='Регистрация', form=form,
-                           css=url_for('static', filename='css/join_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/join_style.css'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """ обратчик страницы с авторизацией """
+    if current_user.is_authenticated:
+        return redirect('/profile')
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -392,9 +390,9 @@ def login():
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form,
-                               css=url_for('static', filename='css/login_style.css'), theme=get_theme())
+                               css=url_for('static', filename='css/login_style.css'))
     return render_template('login.html', title='Авторизация', form=form,
-                           css=url_for('static', filename='css/login_style.css'), theme=get_theme())
+                           css=url_for('static', filename='css/login_style.css'))
 
 
 def get_quiz_questions():
@@ -459,7 +457,7 @@ def add_question():
 
         return redirect('/')
 
-    return render_template('quiz_add_question.html', form=form, theme=get_theme())
+    return render_template('quiz_add_question.html', form=form)
 
 
 @app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
@@ -506,7 +504,7 @@ def editing():
         return redirect(url_for('main_page'))
 
     questions = get_quiz_questions()
-    return render_template('quiz_editing.html', questions=questions, finish_flag=False, theme=get_theme())
+    return render_template('quiz_editing.html', questions=questions, finish_flag=False)
 
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
@@ -520,15 +518,6 @@ def dalete(question_id):
     cur.execute(s)
     con.commit()
     return redirect(url_for('editing'))
-
-
-@app.route('/change_theme')
-def change_theme():
-    if get_theme() == 'white':
-        session['theme'] = 'dark'
-    else:
-        session['theme'] = 'white'
-    return '<script>document.location.href = document.referrer</script>'
 
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
@@ -557,23 +546,28 @@ def quiz(question_number, status):
                     quiz_results[current_user.email][i] = -1
 
         return render_template('start_quiz.html', next_page='/quiz/0/question',
-                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
+                               answer_list=[quiz_results[current_user.email][i] for i in
+                                            questions_id] if current_user.is_authenticated else
+                               session[
                                    'answer_list'],
-                               finish_flag=True, theme=get_theme())
+                               finish_flag=True)
     elif question_number >= len(session['questions']):
         return render_template('quiz_end.html', finish_flag=True,
-                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
-                                   'answer_list'], theme=get_theme())
+                               answer_list=[quiz_results[current_user.email][i] for i in
+                                            questions_id] if current_user.is_authenticated else
+                               session['answer_list'])
     elif status == 'question':
         question = session['questions'][question_number]['question']
-        answers = [session['questions'][question_number]['right'], *session['questions'][question_number]['false']]
+        answers = [session['questions'][question_number]['right'],
+                   *session['questions'][question_number]['false']]
         shuffle(answers)
         return render_template('quiz_question.html', question=question,
                                answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}',
                                question_number=question_number,
-                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
-                                   'answer_list'], finish_flag=True, theme=get_theme())
+                               answer_list=[quiz_results[current_user.email][i] for i in
+                                            questions_id] if current_user.is_authenticated else
+                               session['answer_list'], finish_flag=True)
     else:
         answer = status
 
@@ -595,8 +589,9 @@ def quiz(question_number, status):
                                    'explanation'] if 'explanation' in session['questions'][
                                    question_number].keys() else '',
                                right_answer=session['questions'][question_number]['right'],
-                               answer_list=[quiz_results[current_user.email][i] for i in questions_id] if current_user.is_authenticated else session[
-                                   'answer_list'], finish_flag=True, theme=get_theme())
+                               answer_list=[quiz_results[current_user.email][i] for i in
+                                            questions_id] if current_user.is_authenticated else
+                               session['answer_list'], finish_flag=True)
 
 
 @login_manager.user_loader

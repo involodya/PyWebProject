@@ -72,6 +72,7 @@
         }
 
 
+
     </style>
 </head>
 <body>
@@ -86,39 +87,24 @@
         </div>
         <div class="message">
             <section class="Content-unit">
-                <table border="1" width="100%">
-                    <tr>
-                        <td width="200px">{{post.user.name}} {{post.user.surname}}</td>
-                        <td width="800px">{{post.string_created_date}}</td>
-                    </tr>
-                    <tr>
-                        <td width="200px" height="230px">
-                            <img src="{{post.user.avatar}}" width="200px" height="200px">
-                        </td>
-                        <td width="800px">
-                            <h2>{{post.title}}</h2>
-                            <p>{{post.content}}</p>
-                            {% if post.attachment %}
-                            <div>
-                                <img src="{{post.attachment}}" width="80%" height="100%">
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{{post.user.about}}</td>
-                        <td>
-                            <div style="float:left;">
-                                <a href="/post_like/{{post.id}}" class="btn btn-primary"
-                                   style="background-color: green;">👍 {{post.likes}}</a>
-                                <a href="/post_dislike/{{post.id}}" class="btn btn-primary"
-                                   style="background-color: red;">👎 {{post.dislikes}}</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <br/>
-            </section>
+            <table border="0" width="100%">
+                <tr align="center">
+                    <td width="20%"></td>
+                    <td width="80%" align="right">{{post.string_created_date}}</td>
+                </tr>
+                <tr>
+                    <td width="10vh" height="10vh" align="center" style="vertical-align:middle">
+                        <b>{{post.user.name}} {{post.user.surname}}</b>
+                        <b>{{post.user.about}}</b>
+                    </td>
+                    <td width="80%" align="center">
+                        <h2>{{post.title}}</h2>
+                        <p style="padding: 1.5rem">{{post.content}}</p>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+        </section>
         </div>
     </div>
 </div>

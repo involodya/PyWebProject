@@ -6,24 +6,26 @@
         <section class="Content-unit">
             <h1 align="center">Записи в блоге</h1><br/>
             {% if current_user.is_authenticated and current_user.verified %}
-            <a href="/post" class="btn btn-primary">Новый пост</a><br/>
+            <center>
+                <a href="/post" class="btn btn-primary">Новый пост</a><br/>
+            </center>
             {% endif %}
             <br/>
         </section>
         {% for item in posts %}
         <section class="Content-unit">
-            <table border="1" width="100%">
-                <tr>
-                    <td width="20%">{{item.user.name}} {{item.user.surname}}</td>
-                    <td width="80%">{{item.string_created_date}}</td>
+            <table border="0" id="middle">
+                <tr align="center">
+                    <td width="20%"></td>
+                    <td width="80%" align="right">{{item.string_created_date}}</td>
                 </tr>
                 <tr>
-                    <td width="200px" height="230px">
+                    <td width="10vh" height="10vh" align="center" style="vertical-align:middle">
                         <img src="{{item.user.avatar}}" width="200px" height="200px">
                     </td>
-                    <td width="800px">
+                    <td width="80%" align="center">
                         <h2>{{item.title}}</h2>
-                        <p>{{item.content}}</p>
+                        <p style="padding: 1.5rem">{{item.content}}</p>
                         {% if item.attachment %}
                         <div>
                             <img src="{{item.attachment}}" width="80%" height="100%">
@@ -32,17 +34,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>{{item.user.about}}</td>
+                    <td align="center">
+                        <b>{{item.user.name}} {{item.user.surname}}</b>
+                        <b>{{item.user.about}}</b>
+                    </td>
                     <td>
-                        <div id="div-a" style="float:left; height: 40px;">
-                            <a href="/post_like/{{item.id}}" class="btn like_button"
+                        <div style="float:right;">
+                            <a href="/post_like/{{item.id}}" class="btn btn-primary"
                                style="background-color: green;">👍 {{item.likes}}</a>
-                            <a href="/post_dislike/{{item.id}}" class="btn dislike_button"
+                            <a href="/post_dislike/{{item.id}}" class="btn btn-primary"
                                style="background-color: red;">👎 {{item.dislikes}}</a>
                             {% if current_user.is_authenticated and (current_user == item.user or
                             current_user.role == 'admin')%}
-                                <a href="/post/{{item.id}}" class="btn change_button">Изменить</a>
-                                <a href="/post_delete/{{item.id}}" class="btn delete_button">Удалить</a>
+                            <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>
+                            <a href="/post_delete/{{item.id}}" class="btn btn-danger">Удалить</a>
                             {% endif %}
                         </div>
                     </td>

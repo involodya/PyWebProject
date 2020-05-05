@@ -1,3 +1,17 @@
+:root {
+    --text-color: #444444;
+    --blue-color: #535efd;
+    --purple-color: #7B68EE;
+}
+
+
+#middle{
+    width: 50%;
+    left: 25%;
+    position: relative;
+    color: var(--text-color);
+}
+
 h1{
     margin: 10px;
 }
@@ -10,20 +24,19 @@ p{
     margin: 10px;
 }
 
-.Content-unit > a{
+#middle > a{
     position: relative;
     padding: 10px;
     color: white;
-    background-color: var(--quiz-a-color);
+    background-color: var(--blue-color);
     border-radius: 20px;
     display: block;
     margin: 10px;
-    text-decoration: none;
 }
 
-.Content-unit > a:hover{
+#middle > a:hover{
     text-decoration: none;
-    background-color: var(--quiz-a-hover-color);
+    background-color: var(--purple-color);
     color: #f2f2f2;
 }
 
@@ -33,7 +46,7 @@ p{
 
 @keyframes wrong {
     from {background-color: red;}
-    to {background-color: var(--second-background-color);}
+    to {background-color: #f2f2f2;}
 }
 
 .right{
@@ -42,7 +55,7 @@ p{
 
 @keyframes right {
     from {background-color: green;}
-    to {background-color: var(--second-background-color);}
+    to {background-color: #f2f2f2;}
 }
 
 .circle{
@@ -109,18 +122,4 @@ p{
 
 .Content-unit {
     min-height: 35rem;
-    padding-right: 30%;
-    padding-left: 30%;
-}
-
-.Content-unit > p{
-    color: var(--second-text-color);
-}
-
-.Content-unit > h2{
-    color: var(--second-text-color);
-}
-
-.Content-unit > h1{
-    color: var(--second-text-color);
 }

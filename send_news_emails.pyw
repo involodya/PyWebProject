@@ -2,7 +2,7 @@ import argparse
 
 from data.posts import Post
 from data.users import User
-from flask import render_template, Flask
+from flask import render_template, Flask, url_for
 
 from data import db_session
 

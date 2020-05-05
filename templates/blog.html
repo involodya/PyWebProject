@@ -41,8 +41,8 @@
                                style="background-color: red;">👎 {{item.dislikes}}</a>
                             {% if current_user.is_authenticated and (current_user == item.user or
                             current_user.role == 'admin')%}
-                            <a href="/post/{{item.id}}" class="btn change_button">Изменить</a>
-                            <a href="/post_delete/{{item.id}}" class="btn delete_button">Удалить</a>
+                                <a href="/post/{{item.id}}" class="btn change_button">Изменить</a>
+                                <a href="/post_delete/{{item.id}}" class="btn delete_button">Удалить</a>
                             {% endif %}
                         </div>
                     </td>

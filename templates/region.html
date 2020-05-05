@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 align="center">{{region.name}}</h1>
-    <div align="center">
-        <p><img src="https://static-maps.yandex.ru/1.x/?ll={{region.lon}},{{region.lat}}&size=450,450&l=map&spn=1,1" alt="Яндекс.Карты сломались"></p>
+    <div class="Main-content">
+        <section class="Content-unit">
+            <h1 align="center">{{region.name}}</h1>
+            <div align="center">
+                <p><img src="https://static-maps.yandex.ru/1.x/?ll={{region.lon}},{{region.lat}}&size=450,450&l=map&spn=1,1" alt="Яндекс.Карты сломались"></p>
+            </div>
+        </section>
     </div>
 {% endblock %}

@@ -5,7 +5,7 @@ from data.regions import Region
 from data import db_session
 
 #  Обновляем статистику в БД (берем из yandex_statisctics.json)
-
+#  source - https://yandex.ru/maps/api/covid?ajax=1&csrfToken=
 
 with open('yandex_statistics.json', 'r') as stats:
     data = stats.read()

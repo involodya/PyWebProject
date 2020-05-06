@@ -210,7 +210,7 @@ def edit_post(id):
                 f.save(path)
                 post.attachment = path
                 session.commit()
-                return redirect('/blog')
+            return redirect('/blog')
         else:
             abort(404)
     return render_template('post.html', title='Редактирование поста',

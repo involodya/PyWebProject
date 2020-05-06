@@ -14,6 +14,15 @@ from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileFo
 
 from data import db_session
 
+
+POST_ID = 311  # У нас были баги с лайками и дизлайками потому, что приудалении из базы данных поста, удаляется и его id
+                # а значит, что это id может занять другой пост. Так как у пользователя никто не чистит куки то
+                # программа может посчитать что пользователь уже ставил лайк или дизлайк на пост, из-за этого и
+                # происходят баги. Один из выходом завести глобальную переменную и увеличивать ее каждый раз при
+                # создании нового поста. Однако необходимо перед каждым перезапуском программы увеличивать ее
+                # нанекоторое число.
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
@@ -134,7 +143,7 @@ def index():
 @login_required
 def add_post():
     """ Обработчик страницы создания поста """
-
+    global POST_ID
     form = PostForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -142,6 +151,8 @@ def add_post():
         post.title = form.title.data
         post.content = form.content.data
         post.string_created_date = str(datetime.datetime.now())[0:16]
+        post.id = POST_ID + 1
+        POST_ID += 1
         current_user.posts.append(post)
         session.merge(current_user)
         session.commit()
@@ -158,7 +169,7 @@ def add_post():
             post.attachment = path
             session.commit()
 
-        post_id = session.query(Post).order_by(Post.id.desc()).first().id
+        post_id = POST_ID
         print(228, post_id)
         os.system(f'python send_news_emails.pyw --id {post_id}')
 
@@ -240,24 +251,25 @@ def post_delete(id):
 @app.route('/post_like/<int:id>', methods=['GET', 'POST'])
 def post_like(id):
     global post
+    dabs_session = db_session.create_session()
+    post = dabs_session.query(Post).filter(Post.id == id).first()
+
     """ обработчик лайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
     name_dislike = f'post_dislike_{id}'
-    if name_like in session:
-        pass
+
+    if name_like in session.keys() and session[name_like]:
+        post.likes -= 1
+        session[name_like] = None
     else:
-        dabs_session = db_session.create_session()
-        post = dabs_session.query(Post).filter(Post.id == id).first()
-        if post:
-            if name_dislike in session:
-                session.pop(name_dislike, None)
-                post.dislikes -= 1
-            post.likes += 1
-            dabs_session.commit()
-            session[name_like] = 1
-        else:
-            abort(404)
+        post.likes += 1
+        session[name_like] = 1
+        if name_dislike in session and session[name_dislike]:
+            session[name_dislike] = None
+            post.dislikes -= 1
+
+    dabs_session.commit()
 
     return f'{post.likes} {post.dislikes} {id}'
 
@@ -265,25 +277,26 @@ def post_like(id):
 @app.route('/post_dislike/<int:id>', methods=['GET', 'POST'])
 def post_dislike(id):
     global post
-    """ обработчик дизлайка (работает через куки в браузере)"""
+    dabs_session = db_session.create_session()
+    post = dabs_session.query(Post).filter(Post.id == id).first()
+
+    """ обработчик лайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
     name_dislike = f'post_dislike_{id}'
-    if name_dislike in session:
-        pass
+
+    if name_dislike in session.keys() and session[name_dislike]:
+        post.dislikes -= 1
+        session[name_dislike] = None
     else:
-        dabs_session = db_session.create_session()
-        post = dabs_session.query(Post).filter(Post.id == id).first()
-        if post:
-            if name_like in session:
-                session.pop(name_like, None)
-                post.likes -= 1
-            post.dislikes += 1
-            dabs_session.commit()
-            session[name_dislike] = 1
-        else:
-            abort(404)
-    print(post.likes)
+        post.dislikes += 1
+        session[name_dislike] = 1
+        if name_like in session and session[name_like]:
+            session[name_like] = None
+            post.likes -= 1
+
+    dabs_session.commit()
+
     return f'{post.likes} {post.dislikes} {id}'
 
 

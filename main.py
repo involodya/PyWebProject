@@ -15,14 +15,6 @@ from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileFo
 from data import db_session
 
 
-POST_ID = 311  # У нас были баги с лайками и дизлайками потому, что приудалении из базы данных поста, удаляется и его id
-                # а значит, что это id может занять другой пост. Так как у пользователя никто не чистит куки то
-                # программа может посчитать что пользователь уже ставил лайк или дизлайк на пост, из-за этого и
-                # происходят баги. Один из выходом завести глобальную переменную и увеличивать ее каждый раз при
-                # создании нового поста. Однако необходимо перед каждым перезапуском программы увеличивать ее
-                # нанекоторое число.
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
@@ -143,7 +135,7 @@ def index():
 @login_required
 def add_post():
     """ Обработчик страницы создания поста """
-    global POST_ID
+
     form = PostForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -151,8 +143,6 @@ def add_post():
         post.title = form.title.data
         post.content = form.content.data
         post.string_created_date = str(datetime.datetime.now())[0:16]
-        post.id = POST_ID + 1
-        POST_ID += 1
         current_user.posts.append(post)
         session.merge(current_user)
         session.commit()
@@ -169,7 +159,7 @@ def add_post():
             post.attachment = path
             session.commit()
 
-        post_id = POST_ID
+        post_id = session.query(Post).order_by(Post.id.desc()).first().id
         print(228, post_id)
         os.system(f'python send_news_emails.pyw --id {post_id}')
 

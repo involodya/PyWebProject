@@ -44,9 +44,9 @@
                     <td>
                         <div style="float:right;">
                             <a class="{{ item.id }} mark like btn btn-primary"
-                               style="background-color: green;">👍 {{item.likes}}</a>
+                               style="background-color: green; color: white;">👍 {{item.likes}}</a>
                             <a class="{{ item.id }} btn btn-primary mark dislike"
-                               style="background-color: red;">👎 {{item.dislikes}}</a>
+                               style="background-color: red; color: white;">👎 {{item.dislikes}}</a>
                             {% if current_user.is_authenticated and (current_user == item.user or
                             current_user.role == 'admin')%}
                             <a href="/post/{{item.id}}" class="btn btn-primary">Изменить</a>

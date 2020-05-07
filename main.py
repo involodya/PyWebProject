@@ -1,3 +1,4 @@
+import _thread as thread
 import datetime
 import os
 import sqlite3
@@ -9,11 +10,10 @@ from data.regions import Region
 from data.users import User
 from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_ngrok import run_with_ngrok
+from flask_ngrok import start_ngrok
 from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileForm
 
 from data import db_session
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -24,8 +24,8 @@ quiz_results = dict()
 
 def main():
     db_session.global_init("db/database.sqlite")
-    #run_with_ngrok(app)
-    #app.run()
+    # run_with_ngrok(app)
+    # app.run()
     app.run(port=8080, host='127.0.0.1', debug=True)
 
 
@@ -160,8 +160,7 @@ def add_post():
             session.commit()
 
         post_id = session.query(Post).order_by(Post.id.desc()).first().id
-        print(228, post_id)
-        os.system(f'python send_news_emails.pyw --id {post_id}')
+        thread.start_new_thread(os.system, (f'python send_news_emails.pyw --id {post_id}',))
 
         return redirect('/blog')
 

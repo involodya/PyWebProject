@@ -10,7 +10,6 @@ from data.regions import Region
 from data.users import User
 from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_ngrok import start_ngrok
 from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileForm
 
 from data import db_session
@@ -114,7 +113,8 @@ def profile_page():
         profile.speciality = form.speciality.data
         session.commit()
 
-        add_avatar(form.avatar.data, current_user)
+        if bool(form.avatar.data):
+            add_avatar(form.avatar.data, current_user)
 
     return render_template('profile.html', title='Профиль', form=form,
                            css=url_for('static', filename='css/profile_style.css'))
@@ -548,8 +548,7 @@ def quiz(question_number, status):
             if current_user.email not in quiz_results.keys():
                 quiz_results[current_user.email] = dict()
             for i in questions_id:
-                if i not in quiz_results[current_user.email].keys():
-                    quiz_results[current_user.email][i] = -1
+                quiz_results[current_user.email][i] = -1
 
         return render_template('start_quiz.html', next_page='/quiz/0/question',
                                answer_list=[quiz_results[current_user.email][i] for i in

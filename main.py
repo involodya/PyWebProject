@@ -177,7 +177,7 @@ def edit_post(id):
     form = PostForm()
     if request.method == "GET":
         session = db_session.create_session()
-        if current_current_user.role == 'admin':
+        if current_user.role == 'admin':
             post = session.query(Post).filter(Post.id == id).first()
         else:
             post = session.query(Post).filter(Post.id == id,
@@ -189,7 +189,7 @@ def edit_post(id):
             abort(404)
     if form.validate_on_submit():
         session = db_session.create_session()
-        if current_current_user.role == 'admin':
+        if current_user.role == 'admin':
             post = session.query(Post).filter(Post.id == id).first()
         else:
             post = session.query(Post).filter(Post.id == id,
@@ -223,7 +223,7 @@ def post_delete(id):
     """ обработчик удаления поста """
 
     session = db_session.create_session()
-    if current_current_user.role == 'admin':
+    if current_user.role == 'admin':
         post = session.query(Post).filter(Post.id == id).first()
     else:
         post = session.query(Post).filter(Post.id == id,

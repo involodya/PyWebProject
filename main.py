@@ -10,16 +10,26 @@ from data.regions import Region
 from data.users import User
 from data.questions import Question
 from data.false_answers import FalseAnswer
-from flask import Flask, render_template, url_for, redirect, request, abort, session
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask import Flask, render_template, url_for, jsonify
+from flask import redirect, request, abort, session
+from flask_login import LoginManager, login_user, login_required
+from flask_login import logout_user, current_user
 from flask_ngrok import run_with_ngrok
-from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileForm
+from forms import RegisterForm, LoginForm, PostForm
+from forms import MakeQuestionForm, ProfileForm
 
 from data import db_session
 
 from functions import *
 
+#  restful
+from flask_restful import reqparse, abort, Api, Resource
+from restful import posts_resource
+from restful import regions_resource
+
+# настройки приложения
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -28,9 +38,26 @@ quiz_results = dict()
 
 def main():
     db_session.global_init("db/database.sqlite")
+
+    # restful-api
+
+    # список постов
+    api.add_resource(posts_resource.PostListResource, '/api/posts')
+
+    # один пост
+    api.add_resource(posts_resource.PostResource, '/api/posts/<int:post_id>')
+
+    # список регионов
+    api.add_resource(regions_resource.RegionListResource, '/api/regions')
+
+    # один регион
+    api.add_resource(regions_resource.RegionResource, '/api/regions/<int:region_id>')
+
+    # запуск приложения
+
     # run_with_ngrok(app)
     # app.run()
-    app.run(port=8080, host='127.0.0.1', debug=True)
+    app.run(port=8080, host='127.0.0.1')
 
 
 def add_avatar(f, user):
@@ -446,7 +473,6 @@ def add_question():
 @app.route('/quiz/editing/<question_id>/<question_s>/<right_answer>/<false_answers>/<explanation>',
            methods=['GET', 'POST'])
 def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers, explanation):
-
     """ Функция изменения вопроса """
 
     # Изменять вопросы може только админ
@@ -497,7 +523,6 @@ def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers,
 
 @app.route('/quiz/editing', methods=['GET', 'POST'])
 def editing():
-
     """ страница редактирования вопроса """
 
     # редактировать вопрос может только админ
@@ -512,7 +537,6 @@ def editing():
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
 def dalete(question_id):
-
     """ Удаление вопроса """
 
     # Удалять вопрос может только админ
@@ -528,7 +552,6 @@ def dalete(question_id):
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
-
     """ страница прохождения викторины """
 
     # Викторину могут проходить все, в том числе и не авторизованные пользователи.

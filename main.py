@@ -7,6 +7,8 @@ from PIL import Image
 from data.posts import Post
 from data.regions import Region
 from data.users import User
+from data.questions import Question
+from data.false_answers import FalseAnswer
 from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_ngrok import run_with_ngrok
@@ -14,6 +16,7 @@ from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileFo
 
 from data import db_session
 
+from functions import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -402,74 +405,48 @@ def login():
                            css=url_for('static', filename='css/login_style.css'))
 
 
-def get_quiz_questions():
-    """ получение вопросов для викторины """
-
-    con = sqlite3.connect("db/quiz_questions.db")
-    cur = con.cursor()
-
-    questions = cur.execute("""select * from questions""").fetchall()
-    false_answers = cur.execute(
-        """select question_id, false_answer from false_answers""").fetchall()
-    # print('flase answers = ', false_answers)
-    ret = []
-
-    for i in questions:
-        ret.append(dict())
-        ret[-1]['id'] = i[0]
-        ret[-1]['question'] = i[1]
-        ret[-1]['right'] = i[2]
-        if i[3]:
-            ret[-1]['explanation'] = i[3]
-        else:
-            ret[-1]['explanation'] = ''
-        ret[-1]['false'] = []
-        for j in false_answers:
-            if j[0] == i[0]:
-                if j[1] != '':
-                    ret[-1]['false'].append(j[1])
-
-    con.commit()
-
-    return ret
-
-
 @app.route('/quiz/add_question', methods=['GET', 'POST'])
 def add_question():
     """" добавление вопросов """
 
     if not current_user.is_authenticated or not current_user.verified:
-        return redirect(url_for('main_page'))
+        return redirect(url_for('/quiz'))
 
-    con = sqlite3.connect("db/quiz_questions.db")
-    cur = con.cursor()
+    session = db_session.create_session()
+    question = Question()
 
     form = MakeQuestionForm()
     if form.validate_on_submit():
-        con = sqlite3.connect("db/quiz_questions.db")
-        cur = con.cursor()
-        s = f'insert into questions(question, right_answer, explanation) values("{form.question.data}", "{form.right_answer.data}", "{form.explanation.data}")'
-        cur.execute(s)
+        question.question = form.question.data
+        question.right_answer = form.right_answer.data
+        question.explanation = form.explanation.data
 
-        s = f'select id from questions where right_answer = "{form.right_answer.data}"'
-        id = cur.execute(s).fetchall()[0][0]
+        session.add(question)
 
-        for false_answer in form.false_answers.data.split('\n'):
-            false_answer = false_answer.strip(chr(13))
-            s = """insert into false_answers(question_id, false_answer) values(""" + str(
-                id) + ', ' + '\'' + false_answer + '\')'
-            cur.execute(s)
+        session.commit()
 
-        con.commit()
+        id = question.id
 
-        return redirect('/')
+        print(form.false_answers.data)
+
+        for i in form.false_answers.data.split('\n'):
+            print(i)
+            false_answer = FalseAnswer()
+            false_answer.false_answer = i
+            false_answer.question_id = id
+            false_answer.question = question
+            session.add(false_answer)
+
+        session.commit()
+
+        return redirect(url_for('editing'))
 
     return render_template('quiz_add_question.html', form=form)
 
 
-@app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
+@app.route('/quiz/editing/<question_id>/<question_s>/<right_answer>/<false_answers>/<explanation>',
            methods=['GET', 'POST'])
-def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, explanation):
+def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers, explanation):
     if not current_user.is_authenticated or not current_user.verified:
         return redirect(url_for('main_page'))
 
@@ -478,29 +455,36 @@ def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, e
     if explanation == 'none':
         explanation = ''
 
-    question = question.replace('⁂', '?')
+    session = db_session.create_session()
+
+    question_s = question_s.replace('⁂', '?')
     right_answer = right_answer.replace('⁂', '?')
     false_answers = false_answers.replace('⁂', '?')
     explanation = explanation.replace('⁂', '?')
 
-    question = question.replace('⊕', '\n')
+    question_s = question_s.replace('⊕', '\n')
     right_answer = right_answer.replace('⊕', '\n')
     false_answers = false_answers.replace('⊕', '\n')
     explanation = explanation.replace('⊕', '\n')
 
-    con = sqlite3.connect("db/quiz_questions.db")
-    cur = con.cursor()
-    s = f'update questions set(question, right_answer, explanation) = ("{question}", "{right_answer}", "{explanation}") where id == {question_id}'
-    cur.execute(s)
+    question = session.query(Question).filter(Question.id == question_id).first()
 
-    s = f'delete from false_answers where question_id == {question_id}'
-    cur.execute(s)
+    question.question = question_s
+    question.right_answer = right_answer
+    question.explanation = explanation
 
-    for false_answer in false_answers.split('\n'):
-        s = f'insert into false_answers(question_id, false_answer) values("{question_id}", "{false_answer}")'
-        cur.execute(s)
+    false_answers_db = session.query(FalseAnswer)
+    for false_answer in false_answers_db:
+        if false_answer.question_id == question_id:
+            session.delete(false_answer)
 
-    con.commit()
+    for false_answer_s in false_answers.split('\n'):
+        false_answer = FalseAnswer()
+        false_answer.false_answer = false_answer_s
+        false_answer.question_id = question_id
+        session.add(false_answer)
+
+    session.commit()
 
     return redirect(url_for('editing'))
 
@@ -517,13 +501,12 @@ def editing():
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
 def dalete(question_id):
     if not current_user.is_authenticated or not current_user.verified:
-        return redirect(url_for('main_page'))
+        return redirect(url_for('/quiz'))
 
-    con = sqlite3.connect("db/quiz_questions.db")
-    cur = con.cursor()
-    s = f'delete from questions where id == {question_id}'
-    cur.execute(s)
-    con.commit()
+    session = db_session.create_session()
+    session.query(Question).filter(Question.id == question_id).delete()
+    session.commit()
+
     return redirect(url_for('editing'))
 
 

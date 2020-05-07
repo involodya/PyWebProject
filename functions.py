@@ -6,6 +6,7 @@ from data import db_session
 from data.false_answers import FalseAnswer
 from data.questions import Question
 from data.users import User
+import cv2
 
 
 def get_quiz_questions():
@@ -40,41 +41,58 @@ def get_quiz_questions():
 
 
 def add_avatar(f, user):
+    PADDING = 10
+
     # добавим аватар, если пользователь загрузил его
 
     if bool(f):
         type = f.filename.split('.')[-1]
         filename = f'user_avatar_{user.id}.{type}'
+        print(f'user id = {user.id}')
         f.save(os.path.join(
             'static', 'avatars', filename
         ))
 
         #  сделаем аватар квадратным
 
-        im = Image.open(os.path.join(
-            'static', 'avatars', filename
-        ))
-        pixels = im.load()  # список с пикселями
-        x, y = im.size
-        if x > y:
-            size = y
-        else:
-            size = x
-        avatar = Image.new('RGB', (size, size), (0, 0, 0))
-        av_pixels = avatar.load()
+        image_path = os.path.join('static', 'avatars', filename)
 
-        # фото обрезается по центру
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        image = cv2.imread(image_path)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(10, 10)
+        )
+        faces_detected = "Лиц обнаружено: " + format(len(faces))
+        print(faces_detected)
 
-        dx = (x - size) // 2
-        dy = (y - size) // 2
+        height, width, channels = image.shape
+        right_down = [0, height]
+        left_up = [width, 0]
 
-        for i in range(size):
-            for j in range(size):
-                r, g, b = pixels[i + dx, j + dy]
-                av_pixels[i, j] = r, g, b
-        avatar.save(os.path.join(
-            'static', 'avatars', filename
-        ))
+        for x, y, w, h in faces:
+            left_up[0] = min(left_up[0], x - PADDING)
+            left_up[1] = max(left_up[1], y + w + PADDING)
+
+            right_down[0] = max(right_down[0], x + h + PADDING)
+            right_down[1] = min(right_down[1], y - PADDING)
+
+        szx, szy = right_down[0] - left_up[0], right_down[1] - left_up[1]
+        d = abs(szx - szy)
+        if szx > szy:
+            left_up[1] -= d // 2
+            right_down[1] += d // 2
+        elif szx < szy:
+            left_up[0] -= d // d
+            right_down[0] += d // 2
+
+        im = Image.open(image_path)
+
+        cutted_im = im.crop((*left_up, *right_down))
+        cutted_im.save(os.path.join('static', 'avatars', filename))
 
         session = db_session.create_session()
         user = session.query(User).filter(User.id == user.id).first()

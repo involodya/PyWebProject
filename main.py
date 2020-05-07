@@ -582,7 +582,7 @@ if __name__ == '__main__':
 
     # Загружаем переменные среды из файла
     load_dotenv()
-    # Теперь будто бы переданы переменные
+    # Теперь будто бы переданы переменныеgit
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     EMAIL_LOGIN = os.environ.get('EMAIL_LOGIN')
     EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
@@ -602,4 +602,4 @@ if __name__ == '__main__':
     # run_with_ngrok(app)
     # app.run()
     # локальный запуск
-    app.run(port=8080, host='127.0.0.1')
+    app.run(port=8080, host='127.0.0.1', debug=True)

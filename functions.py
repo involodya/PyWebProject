@@ -15,6 +15,10 @@ def get_quiz_questions():
     questions = session.query(Question)
     false_answers = session.query(FalseAnswer)
 
+    # ret список словарей, каждый из словарей описывает один изз вопросов
+    # словарь получается из двух массивов, вопросов и неправильных ответов,
+    # которые в свою очередь сохранены в базе данных
+
     ret = []
 
     for question in questions:

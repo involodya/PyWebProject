@@ -10,6 +10,7 @@ from data.regions import Region
 from data.users import User
 from flask import Flask, render_template, url_for, redirect, request, abort, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_ngrok import run_with_ngrok
 from forms import RegisterForm, LoginForm, PostForm, MakeQuestionForm, ProfileForm
 
 from data import db_session
@@ -315,7 +316,7 @@ def join():
     if current_user.is_authenticated:
         return redirect('/profile')
 
-    def send_started_email(name, acc_login, acc_password, toAdr):
+    def send_started_email(name, acc_login, acc_password, to_adr):
         import imaplib
         import smtplib
         login = 'yourmesseger@yandex.ru'
@@ -330,7 +331,7 @@ def join():
 
         msg = MIMEMultipart()  # Создаём прототип сообщения
         msg['From'] = login
-        msg['To'] = toAdr
+        msg['To'] = to_adr
         msg['Subject'] = 'Регистрация в системе COVID-19'
 
         body = render_template('started_email.html', name=str(name), login=str(acc_login),
@@ -341,7 +342,7 @@ def join():
         server.starttls()
         server.login(login, password)
         text = msg.as_string()
-        server.sendmail(login, toAdr, text)
+        server.sendmail(login, to_adr, text)
         server.quit()
 
     form = RegisterForm()
@@ -393,7 +394,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
+        return render_template('login.html', title='Авторизация',
                                message="Неправильный логин или пароль",
                                form=form,
                                css=url_for('static', filename='css/login_style.css'))
@@ -463,7 +464,7 @@ def add_question():
 
         return redirect('/')
 
-    return render_template('quiz_add_question.html', form=form)
+    return render_template('quiz_add_question.html', title='Викторина', form=form)
 
 
 @app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
@@ -510,7 +511,8 @@ def editing():
         return redirect(url_for('main_page'))
 
     questions = get_quiz_questions()
-    return render_template('quiz_editing.html', questions=questions, finish_flag=False)
+    return render_template('quiz_editing.html', title='Викторина', questions=questions,
+                           finish_flag=False)
 
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
@@ -550,14 +552,14 @@ def quiz(question_number, status):
             for i in questions_id:
                 quiz_results[current_user.email][i] = -1
 
-        return render_template('start_quiz.html', next_page='/quiz/0/question',
+        return render_template('start_quiz.html', title='Викторина', next_page='/quiz/0/question',
                                answer_list=[quiz_results[current_user.email][i] for i in
                                             questions_id] if current_user.is_authenticated else
                                session[
                                    'answer_list'],
                                finish_flag=True)
     elif question_number >= len(session['questions']):
-        return render_template('quiz_end.html', finish_flag=True,
+        return render_template('quiz_end.html', title='Викторина', finish_flag=True,
                                answer_list=[quiz_results[current_user.email][i] for i in
                                             questions_id] if current_user.is_authenticated else
                                session['answer_list'])
@@ -566,7 +568,7 @@ def quiz(question_number, status):
         answers = [session['questions'][question_number]['right'],
                    *session['questions'][question_number]['false']]
         shuffle(answers)
-        return render_template('quiz_question.html', question=question,
+        return render_template('quiz_question.html', title='Викторина', question=question,
                                answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}',
                                question_number=question_number,
@@ -588,7 +590,7 @@ def quiz(question_number, status):
             else:
                 session['answer_list'][question_number] = 0
 
-        return render_template('quiz_explanation.html', right=right,
+        return render_template('quiz_explanation.html', title='Викторина', right=right,
                                next_page=f'/quiz/{question_number + 1}/question',
                                explanation=session['questions'][question_number][
                                    'explanation'] if 'explanation' in session['questions'][

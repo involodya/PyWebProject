@@ -177,7 +177,7 @@ def edit_post(id):
     form = PostForm()
     if request.method == "GET":
         session = db_session.create_session()
-        if current_user.role == 'admin':
+        if current_current_user.role == 'admin':
             post = session.query(Post).filter(Post.id == id).first()
         else:
             post = session.query(Post).filter(Post.id == id,
@@ -189,7 +189,7 @@ def edit_post(id):
             abort(404)
     if form.validate_on_submit():
         session = db_session.create_session()
-        if current_user.role == 'admin':
+        if current_current_user.role == 'admin':
             post = session.query(Post).filter(Post.id == id).first()
         else:
             post = session.query(Post).filter(Post.id == id,
@@ -223,7 +223,7 @@ def post_delete(id):
     """ обработчик удаления поста """
 
     session = db_session.create_session()
-    if current_user.role == 'admin':
+    if current_current_user.role == 'admin':
         post = session.query(Post).filter(Post.id == id).first()
     else:
         post = session.query(Post).filter(Post.id == id,
@@ -438,7 +438,7 @@ def get_quiz_questions():
 def add_question():
     """" добавление вопросов """
 
-    if not current_user.is_authenticated or not current_user.verified:
+    if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
     con = sqlite3.connect("db/quiz_questions.db")
@@ -470,7 +470,7 @@ def add_question():
 @app.route('/quiz/editing/<question_id>/<question>/<right_answer>/<false_answers>/<explanation>',
            methods=['GET', 'POST'])
 def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, explanation):
-    if not current_user.is_authenticated or not current_user.verified:
+    if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
     if not current_user.verified:
@@ -507,7 +507,7 @@ def set_quiz_changes_to_db(question_id, question, right_answer, false_answers, e
 
 @app.route('/quiz/editing', methods=['GET', 'POST'])
 def editing():
-    if not current_user.is_authenticated or not current_user.verified:
+    if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
     questions = get_quiz_questions()
@@ -517,7 +517,7 @@ def editing():
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
 def dalete(question_id):
-    if not current_user.is_authenticated or not current_user.verified:
+    if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
     con = sqlite3.connect("db/quiz_questions.db")

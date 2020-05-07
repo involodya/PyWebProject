@@ -525,7 +525,6 @@ def quiz(question_number, status):
     if not question_number.isdigit():
         return redirect('/')
     question_number = int(question_number)
-
     if status == 'start':
         session['questions'] = get_quiz_questions()
         questions_id = [i['id'] for i in session['questions']]

@@ -279,7 +279,7 @@ def join():
         from email.mime.text import MIMEText
 
         msg = MIMEMultipart()  # Создаём прототип сообщения
-        msg['From'] = login
+        msg['From'] = EMAIL_LOGIN
         msg['To'] = to_adr
         msg['Subject'] = 'Регистрация в системе COVID-19'
 
@@ -291,7 +291,7 @@ def join():
         server.starttls()
         server.login(EMAIL_LOGIN, EMAIL_PASSWORD)
         text = msg.as_string()
-        server.sendmail(login, to_adr, text)
+        server.sendmail(EMAIL_LOGIN, to_adr, text)
         server.quit()
 
     form = RegisterForm()

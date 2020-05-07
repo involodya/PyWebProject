@@ -1,27 +1,32 @@
 import argparse
+import imaplib
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-from data.posts import Post
-from data.users import User
-from flask import render_template, Flask, url_for
+from dotenv import load_dotenv
+from flask import render_template, Flask
 
 from data import db_session
+from data.posts import Post
+from data.users import User
 
 
 def send_news_email(html, toAdr):
-    import imaplib
-    import smtplib
-    login = 'yourmesseger@yandex.ru'
-    password = 'passwordforyandex111'
+    # Загружаем переменные среды из файла
+    load_dotenv()
+    # Теперь будто бы переданы переменные
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    EMAIL_LOGIN = os.environ.get('EMAIL_LOGIN')
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
     server = 'imap.yandex.ru'
     mail = imaplib.IMAP4_SSL(server)
-    mail.login(login, password)
+    mail.login(EMAIL_LOGIN, EMAIL_PASSWORD)
     SMTPserver = 'smtp.' + ".".join(server.split('.')[1:])
 
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-
     msg = MIMEMultipart()  # Создаём прототип сообщения
-    msg['From'] = login
+    msg['From'] = EMAIL_LOGIN
     msg['To'] = toAdr
     msg['Subject'] = 'Новость на портале COVID-19'
 
@@ -29,9 +34,9 @@ def send_news_email(html, toAdr):
 
     server = smtplib.SMTP(SMTPserver, 587)  # отправляем
     server.starttls()
-    server.login(login, password)
+    server.login(EMAIL_LOGIN, EMAIL_PASSWORD)
     text = msg.as_string()
-    server.sendmail(login, toAdr, text)
+    server.sendmail(EMAIL_LOGIN, toAdr, text)
     server.quit()
 
 

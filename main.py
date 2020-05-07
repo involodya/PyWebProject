@@ -1,114 +1,33 @@
 import _thread as thread
 import datetime
 import os
-import sqlite3
 from random import shuffle
+from dotenv import load_dotenv
 
-from PIL import Image
-from data.posts import Post
-from data.regions import Region
-from data.users import User
-from data.questions import Question
-from data.false_answers import FalseAnswer
-from flask import Flask, render_template, url_for, jsonify
-from flask import redirect, request, abort, session
-from flask_login import LoginManager, login_user, login_required
-from flask_login import logout_user, current_user
-from flask_ngrok import run_with_ngrok
-from forms import RegisterForm, LoginForm, PostForm
-from forms import MakeQuestionForm, ProfileForm
+from flask import Flask, render_template, url_for, redirect, request, abort, session, jsonify
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 from data import db_session
+from data.false_answers import FalseAnswer
+from data.posts import Post
+from data.questions import Question
+from data.regions import Region
+from data.users import User
 
-from functions import *
+from forms import MakeQuestionForm, ProfileForm, RegisterForm, LoginForm, PostForm
+
+from functions import add_avatar, get_quiz_questions
 
 #  restful
 from flask_restful import reqparse, abort, Api, Resource
-from restful import posts_resource
-from restful import regions_resource
+from restful import posts_resource, regions_resource
 
 # настройки приложения
 app = Flask(__name__)
 api = Api(app)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 quiz_results = dict()
-
-
-def main():
-    db_session.global_init("db/database.sqlite")
-
-    # restful-api
-
-    # список постов
-    api.add_resource(posts_resource.PostListResource, '/api/posts')
-
-    # один пост
-    api.add_resource(posts_resource.PostResource, '/api/posts/<int:post_id>')
-
-    # список регионов
-    api.add_resource(regions_resource.RegionListResource, '/api/regions')
-
-    # один регион
-    api.add_resource(regions_resource.RegionResource, '/api/regions/<int:region_id>')
-
-    # запуск приложения
-
-    # run_with_ngrok(app)
-    # app.run()
-    app.run(port=8080, host='127.0.0.1')
-
-
-def add_avatar(f, user):
-    # добавим аватар, если пользователь загрузил его
-
-    if bool(f):
-        type = f.filename.split('.')[-1]
-        filename = f'user_avatar_{user.id}.{type}'
-        f.save(os.path.join(
-            'static', 'avatars', filename
-        ))
-
-        #  сделаем аватар квадратным
-
-        im = Image.open(os.path.join(
-            'static', 'avatars', filename
-        ))
-        pixels = im.load()  # список с пикселями
-        x, y = im.size
-        if x > y:
-            size = y
-        else:
-            size = x
-        avatar = Image.new('RGB', (size, size), (0, 0, 0))
-        av_pixels = avatar.load()
-
-        # фото обрезается по центру
-
-        dx = (x - size) // 2
-        dy = (y - size) // 2
-
-        for i in range(size):
-            for j in range(size):
-                r, g, b = pixels[i + dx, j + dy]
-                av_pixels[i, j] = r, g, b
-        avatar.save(os.path.join(
-            'static', 'avatars', filename
-        ))
-
-        session = db_session.create_session()
-        user = session.query(User).filter(User.id == user.id).first()
-        user.avatar = os.path.join(
-            'static', 'avatars', filename
-        )
-        session.commit()
-
-    else:
-        session = db_session.create_session()
-        user = session.query(User).filter(User.id == user.id).first()
-        user.avatar = "/../static/avatars/user_avatar_default.jpg"
-        session.commit()
 
 
 @app.route('/')
@@ -192,6 +111,8 @@ def add_post():
             session.commit()
 
         post_id = session.query(Post).order_by(Post.id.desc()).first().id
+
+        # Параллельным процессом запускаем рассыку новости всем зарегистрированным пользователям
         thread.start_new_thread(os.system, (f'python send_news_emails.pyw --id {post_id}',))
 
         return redirect('/blog')
@@ -271,11 +192,10 @@ def post_delete(id):
 
 @app.route('/post_like/<int:id>', methods=['GET', 'POST'])
 def post_like(id):
+    """ обработчик лайка (работает через куки в браузере)"""
     global post
     dabs_session = db_session.create_session()
     post = dabs_session.query(Post).filter(Post.id == id).first()
-
-    """ обработчик лайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
     name_dislike = f'post_dislike_{id}'
@@ -297,11 +217,10 @@ def post_like(id):
 
 @app.route('/post_dislike/<int:id>', methods=['GET', 'POST'])
 def post_dislike(id):
+    """ обработчик дизлайка (работает через куки в браузере)"""
     global post
     dabs_session = db_session.create_session()
     post = dabs_session.query(Post).filter(Post.id == id).first()
-
-    """ обработчик лайка (работает через куки в браузере)"""
 
     name_like = f'post_like_{id}'
     name_dislike = f'post_dislike_{id}'
@@ -348,13 +267,12 @@ def join():
         return redirect('/profile')
 
     def send_started_email(name, acc_login, acc_password, to_adr):
+        """ Функция отправки сообщения об успешной регистрации """
         import imaplib
         import smtplib
-        login = 'yourmesseger@yandex.ru'
-        password = 'passwordforyandex111'
         server = 'imap.yandex.ru'
         mail = imaplib.IMAP4_SSL(server)
-        mail.login(login, password)
+        mail.login(EMAIL_LOGIN, EMAIL_PASSWORD)
         SMTPserver = 'smtp.' + ".".join(server.split('.')[1:])
 
         from email.mime.multipart import MIMEMultipart
@@ -371,7 +289,7 @@ def join():
 
         server = smtplib.SMTP(SMTPserver, 587)  # отправляем
         server.starttls()
-        server.login(login, password)
+        server.login(EMAIL_LOGIN, EMAIL_PASSWORD)
         text = msg.as_string()
         server.sendmail(login, to_adr, text)
         server.quit()
@@ -456,7 +374,8 @@ def add_question():
 
         id = question.id
 
-        for i in form.false_answers.data.split('\n'):  # Неправильные вопросы в форме разделены переводами строк
+        for i in form.false_answers.data.split(
+                '\n'):  # Неправильные вопросы в форме разделены переводами строк
             false_answer = FalseAnswer()
             false_answer.false_answer = i
             false_answer.question_id = id
@@ -536,7 +455,7 @@ def editing():
 
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
-def dalete(question_id):
+def delete_handler(question_id):
     """ Удаление вопроса """
 
     # Удалять вопрос может только админ
@@ -659,4 +578,28 @@ def logout():
 
 
 if __name__ == '__main__':
-    main()
+    db_session.global_init("db/database.sqlite")
+
+    # Загружаем переменные среды из файла
+    load_dotenv()
+    # Теперь будто бы переданы переменные
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    EMAIL_LOGIN = os.environ.get('EMAIL_LOGIN')
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+
+    # restful-api
+    # список постов
+    api.add_resource(posts_resource.PostListResource, '/api/posts')
+    # один пост
+    api.add_resource(posts_resource.PostResource, '/api/posts/<int:post_id>')
+    # список регионов
+    api.add_resource(regions_resource.RegionListResource, '/api/regions')
+    # один регион
+    api.add_resource(regions_resource.RegionResource, '/api/regions/<int:region_id>')
+
+    # запуск приложения
+    # глобальный запуск
+    # run_with_ngrok(app)
+    # app.run()
+    # локальный запуск
+    app.run(port=8080, host='127.0.0.1')

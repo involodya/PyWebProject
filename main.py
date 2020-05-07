@@ -410,6 +410,7 @@ def login():
 def add_question():
     """" добавление вопросов """
 
+    # Только админ может добавлять вопросы
     if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
@@ -417,26 +418,23 @@ def add_question():
     question = Question()
 
     form = MakeQuestionForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit():  # Если форма заполнена, записываем информацию о вопроме в базу данных
         question.question = form.question.data
         question.right_answer = form.right_answer.data
         question.explanation = form.explanation.data
 
-        session.add(question)
+        session.add(question)  # Запись вопроса в базу данных
 
         session.commit()
 
         id = question.id
 
-        print(form.false_answers.data)
-
-        for i in form.false_answers.data.split('\n'):
-            print(i)
+        for i in form.false_answers.data.split('\n'):  # Неправильные вопросы в форме разделены переводами строк
             false_answer = FalseAnswer()
             false_answer.false_answer = i
             false_answer.question_id = id
             false_answer.question = question
-            session.add(false_answer)
+            session.add(false_answer)  # записываем неправильный вопрос в базу данных
 
         session.commit()
 
@@ -448,16 +446,22 @@ def add_question():
 @app.route('/quiz/editing/<question_id>/<question_s>/<right_answer>/<false_answers>/<explanation>',
            methods=['GET', 'POST'])
 def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers, explanation):
+
+    """ Функция изменения вопроса """
+
+    # Изменять вопросы може только админ
     if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
-    if not current_user.verified:
-        return redirect('/')
+    # При передаче данных пустое explanation (объяснение) передается как none, но хранить и выводить пользователю нужно
+    # пустую строку
     if explanation == 'none':
         explanation = ''
 
     session = db_session.create_session()
 
+    # Вопросительный знак и перевод строки некоректно передаются через адресную строку, пожтому перед передачей
+    # они заменяются на редко используемые символы, а при приеме заменяются обратно
     question_s = question_s.replace('⁂', '?')
     right_answer = right_answer.replace('⁂', '?')
     false_answers = false_answers.replace('⁂', '?')
@@ -468,6 +472,7 @@ def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers,
     false_answers = false_answers.replace('⊕', '\n')
     explanation = explanation.replace('⊕', '\n')
 
+    # изменение данных вопроса
     question = session.query(Question).filter(Question.id == question_id).first()
 
     question.question = question_s
@@ -492,9 +497,14 @@ def set_quiz_changes_to_db(question_id, question_s, right_answer, false_answers,
 
 @app.route('/quiz/editing', methods=['GET', 'POST'])
 def editing():
+
+    """ страница редактирования вопроса """
+
+    # редактировать вопрос может только админ
     if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
+    # получение вопросов и передача их в шаблонизатор
     questions = get_quiz_questions()
     return render_template('quiz_editing.html', title='Викторина', questions=questions,
                            finish_flag=False)
@@ -502,6 +512,10 @@ def editing():
 
 @app.route('/delete/<question_id>', methods=['GET', 'POST'])
 def dalete(question_id):
+
+    """ Удаление вопроса """
+
+    # Удалять вопрос может только админ
     if not current_user.is_authenticated or not current_user.verified or not current_user.role == 'admin':
         return redirect(url_for('main_page'))
 
@@ -514,21 +528,35 @@ def dalete(question_id):
 
 @app.route('/quiz/<question_number>/<status>', methods=['GET', 'POST'])
 def quiz(question_number, status):
+
+    """ страница прохождения викторины """
+
+    # Викторину могут проходить все, в том числе и не авторизованные пользователи.
+    # Единственная разница в том, что у авторизованных пользователей результат прохождения сохраняется на сервере
+    # и они в любой момент могут его посмотреть, а у неавторизовыных пользователей результат сохраняется
+    # в session['answer_list'] и хранится временно
+
     global quiz_results, questions_id
 
     if status != 'start':
+        # Если пользователь не имеет необходимых массивов для хранения результата,
+        # его перенаправляет в начало викторины, где эти массивы и создаются
         if 'questions' not in session.keys():
             return redirect('/quiz/0/start')
         if not session['questions']:
             return redirect('/quiz/0/start')
 
+    # Если неправильно введен номер вопроса, пользователя перенаправляют в начало викторины
     if not question_number.isdigit():
-        return redirect('/')
+        return redirect('/quiz/0/start')
     question_number = int(question_number)
+
     if status == 'start':
+        # Начало викторины, создание массивов для хранения результата
         session['questions'] = get_quiz_questions()
         questions_id = [i['id'] for i in session['questions']]
         session['answer_list'] = [-1] * len(session['questions'])
+
         if current_user.is_authenticated:
             if current_user.email not in quiz_results.keys():
                 quiz_results[current_user.email] = dict()
@@ -542,15 +570,20 @@ def quiz(question_number, status):
                                    'answer_list'],
                                finish_flag=True)
     elif question_number >= len(session['questions']):
+        # Конец викторины
         return render_template('quiz_end.html', title='Викторина', finish_flag=True,
                                answer_list=[quiz_results[current_user.email][i] for i in
                                             questions_id] if current_user.is_authenticated else
                                session['answer_list'])
     elif status == 'question':
+        # Отображение вопросы перед пользователем
         question = session['questions'][question_number]['question']
         answers = [session['questions'][question_number]['right'],
                    *session['questions'][question_number]['false']]
+
+        # Рандомное ответов, чтобы они не оказывались каждый раз в одном и том-же порядке
         shuffle(answers)
+
         return render_template('quiz_question.html', title='Викторина', question=question,
                                answers=[str(i) for i in answers],
                                next_page=f'/quiz/{question_number}',
@@ -559,6 +592,7 @@ def quiz(question_number, status):
                                             questions_id] if current_user.is_authenticated else
                                session['answer_list'], finish_flag=True)
     else:
+        # Пользователь дал ответ и его нужно проверить
         answer = status
 
         right = str(answer) == str(session['questions'][question_number]['right'])

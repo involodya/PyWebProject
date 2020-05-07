@@ -4,7 +4,12 @@
 <div class="Main-content">
     <section class="Content-unit">
         <main role="main" class="container">
-            <h1>Регистрация</h1>
+            <h1>Профиль</h1>
+            {% if current_user.verified %}
+                <p>Ваш аккаунт верифицирован</p>
+            {% else %}
+                <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>
+            {% endif %}
             <form action="" method="post" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 {{ form.csrf_token }}
@@ -12,24 +17,6 @@
                     {{ form.email.label }}<br>
                     {{ form.email(class="form-control", type="email") }}<br>
                     {% for error in form.email.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-                {% endfor %}
-                </p>
-                <p>
-                    {{ form.password.label }}<br>
-                    {{ form.password(class="form-control", type="password") }}<br>
-                    {% for error in form.password.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-                {% endfor %}
-                </p>
-                <p>
-                    {{ form.password_again.label }}<br>
-                    {{ form.password_again(class="form-control", type="password") }}<br>
-                    {% for error in form.password_again.errors %}
                 <p class="alert alert-danger" role="alert">
                     {{ error }}
                 </p>
@@ -100,9 +87,6 @@
                 {% endfor %}
                 </p>
 
-
-                <p>{{ form.agree() }} {{ form.agree.label }}</p>
-                <p>Вы получите доступ к сайту после подтверждения вашего аккаунта модератором</p>
                 <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
                 <p style="color:red">{{message}}</p>
             </form>

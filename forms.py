@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms import IntegerField, BooleanField, FileField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
@@ -22,6 +22,19 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Зарегистрироваться')
 
 
+class ProfileForm(FlaskForm):
+    """ форма профиля пользователя """
+    email = EmailField('E-mail (изменять нельзя):', validators=[DataRequired()])
+    surname = StringField('Фамилия:', validators=[DataRequired()])
+    name = StringField('Имя:', validators=[DataRequired()])
+    age = IntegerField('Возраст:', validators=[DataRequired()])
+    about = StringField('О себе:')
+    education = StringField('Образование:', validators=[DataRequired()])
+    speciality = StringField('Род деятельности:', validators=[DataRequired()])
+    avatar = FileField('Загрузите фото профиля')
+    submit = SubmitField('Сохранить изменения')
+
+
 class LoginForm(FlaskForm):
     """ форма входа на сайт """
 
@@ -36,4 +49,15 @@ class PostForm(FlaskForm):
 
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField("Содержание")
+    attachment = FileField('Прикрепить фото')
     submit = SubmitField('Запостить')
+
+
+class MakeQuestionForm(FlaskForm):
+    """ форма создания вопроса для викторины """
+
+    question = StringField('Вопрос', validators=[DataRequired()])
+    right_answer = StringField('Правильный ответ', validators=[DataRequired()])
+    false_answers = TextAreaField('Неправильныу ответы', validators=[DataRequired()])
+    explanation = StringField('Пояснение')
+    submit = SubmitField('Создать вопрос')

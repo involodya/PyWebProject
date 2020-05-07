@@ -1,10 +1,10 @@
 import sqlalchemy
-
+from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
 
-class Region(SqlAlchemyBase):
+class Region(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'regions'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,

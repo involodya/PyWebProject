@@ -1,0 +1,125 @@
+:root {
+    --text-color: #444444;
+    --blue-color: #535efd;
+    --purple-color: #7B68EE;
+}
+
+
+#middle{
+    width: 50%;
+    left: 25%;
+    position: relative;
+    color: var(--text-color);
+}
+
+h1{
+    margin: 10px;
+}
+
+h2{
+    margin: 10px;
+}
+
+p{
+    margin: 10px;
+}
+
+#middle > a{
+    position: relative;
+    padding: 10px;
+    color: white;
+    background-color: var(--blue-color);
+    border-radius: 20px;
+    display: block;
+    margin: 10px;
+}
+
+#middle > a:hover{
+    text-decoration: none;
+    background-color: var(--purple-color);
+    color: #f2f2f2;
+}
+
+.wrong{
+    animation: wrong 2s;
+}
+
+@keyframes wrong {
+    from {background-color: red;}
+    to {background-color: #f2f2f2;}
+}
+
+.right{
+    animation: right 2s;
+}
+
+@keyframes right {
+    from {background-color: green;}
+    to {background-color: #f2f2f2;}
+}
+
+.circle{
+    position: relative;
+    display: inline-block;
+    float: left;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    margin: 5px;
+}
+
+.circle_menu > a{
+    border: 5px solid #bbbbbb;
+}
+
+.circle_menu{
+    display: block;
+    height: 40px;
+}
+
+.question{
+    display: block;
+    border-radius: 20px;
+    margin: 10px;
+}
+
+.question:hover > .question-tittle{
+    color: black;
+}
+
+.question > div{
+    display: inline-block;
+    font-size: 20px;
+    padding-left: 10px;
+}
+
+.commit-question-changes{
+    height: 40px;
+    display: block;
+    background-color: var(--blue-color);
+    border-radius: 20px;
+    padding: 6px;
+}
+
+.commit-question-changes:hover{
+    background-color: var(--purple-color);
+}
+
+.svg-iframe{
+    height: 20px;
+    width: 20px;
+    border: none;
+
+}
+
+.delete-question{
+    float: right;
+}
+
+.open-edit > *{
+    display: inline-block;
+}
+
+.Content-unit {
+    min-height: 35rem;
+}

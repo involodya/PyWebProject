@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
+        td {
+            vertical-align: top;
+        }
+
+        .Content-unit {
+             width: 100%;
+        }
+
         body {
             min-width: 500px;
         }
@@ -54,6 +62,16 @@
             padding-bottom: 5%;
         }
 
+        .Content-unit {
+            margin-left: 30px;
+            margin-right: 30px;
+            margin-bottom: 15px;
+            padding: 2.25rem;
+            border-radius: 10px;
+            background: #f2f2f2;
+        }
+
+
 
     </style>
 </head>
@@ -68,10 +86,25 @@
             </a>
         </div>
         <div class="message">
-            <h1>Привет, {{name}}!</h1>
-            <p>Спасибо за регистрацию на нашем ресурсе!</p>
-            <p>Ваш логин: {{login}}</p>
-            <p>Ваш пароль: {{password}}</p>
+            <section class="Content-unit">
+            <table border="0" width="100%">
+                <tr align="center">
+                    <td width="20%"></td>
+                    <td width="80%" align="right">{{post.string_created_date}}</td>
+                </tr>
+                <tr>
+                    <td width="10vh" height="10vh" align="center" style="vertical-align:middle">
+                        <b>{{post.user.name}} {{post.user.surname}}</b>
+                        <b>{{post.user.about}}</b>
+                    </td>
+                    <td width="80%" align="center">
+                        <h2>{{post.title}}</h2>
+                        <p style="padding: 1.5rem">{{post.content}}</p>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+        </section>
         </div>
     </div>
 </div>

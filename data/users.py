@@ -4,9 +4,10 @@ from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy_serializer import SerializerMixin
 
 
-class User(SqlAlchemyBase, UserMixin):
+class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -31,5 +32,6 @@ class User(SqlAlchemyBase, UserMixin):
                                      default=datetime.datetime.now)
     role = sqlalchemy.Column(sqlalchemy.String, default='user')
     verified = sqlalchemy.Column(sqlalchemy.Boolean, autoincrement=True, default=False)
+
     avatar = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     posts = orm.relation("Post", back_populates='user')

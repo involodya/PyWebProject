@@ -1,4 +1,4 @@
-# How to add many languages to README.md
+# Mission Kill Coronavirus
 
 [![flagru][flagru]][readmeru] [![flagen][flagen]][readmeen]
 

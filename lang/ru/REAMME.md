@@ -25,8 +25,8 @@ python main.py
 * html+Css
 * JavaScript (Библиотеки Jquery и Ajax)
 
-[readmeru]: https://github.com/victormorozov1/multy-lang-readme/blob/master/lang/ru/REAMME.md "Ru"
+[readmeru]: https://github.com/matv3ys/Web-project/blob/master/lang/ru/REAMME.md "Ru"
 [flagru]: https://madeas.github.io/src/ru.png
 
-[readmeen]: https://github.com/victormorozov1/multy-lang-readme/blob/master/README.md "En"
+[readmeen]: https://github.com/matv3ys/Web-project/blob/master/README.md "En"
 [flagen]: https://madeas.github.io/src/en.png

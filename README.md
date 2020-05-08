@@ -2,6 +2,12 @@
 
 [![flagru][flagru]][readmeru] [![flagen][flagen]][readmeen]
 
+## How to download and run
+```cmd
+git clone https://github.com/matv3ys/Web-project.git
+cd Web-project
+python main.py
+```
 
 ## What is our project like
 Our project is a site on the topic of coronavirus. All users

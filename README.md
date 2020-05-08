@@ -11,7 +11,7 @@ python main.py
 
 ## What is our project like
 Our project is a site on the topic of coronavirus. All users
-they are divided into verified and unverified. 
+are divided into verified and unverified. 
 Verification is performed by site administrators.
 The site itself consists of several sections:
 * Blog where verified users can add posts
